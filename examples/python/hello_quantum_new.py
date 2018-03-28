@@ -28,15 +28,20 @@ try:
     # Create a Classical Register called "cr" with 2 bits.
     cr = qiskit.ClassicalRegister("cr", 2)
     # Create a Quantum Circuit called involving "qr" and "cr"
-    qc = qiskit.QuantumCircuit(qr, cr)
+    qc1 = qiskit.QuantumCircuit(qr, cr)
 
     # Add a H gate on qubit 0, putting this qubit in superposition.
-    qc.h(qr[0])
+    qc1.h(qr[0])
     # Add a CX (CNOT) gate on control qubit 0 and target qubit 1, putting
     # the qubits in a Bell state.
-    qc.cx(qr[0], qr[1])
+    qc1.cx(qr[0], qr[1])
     # Add a Measure gate to see the state.
-    qc.measure(qr, cr)
+    qc1.measure(qr, cr)
+
+    # making another circuit of all superpositions
+    qc2 = qiskit.QuantumCircuit(qr, cr)
+    qc2.h(qr)
+    qc2.measure(qr, cr)
  
     #setting up the backend
     print("(Local Backends)")
@@ -50,8 +55,10 @@ try:
 
     #compiling the job
     qp = qiskit.QuantumProgram()
-    qp.add_circuit("bell", qc)
-    qobj = qp.compile("bell", backend='local_qasm_simulator', shots=1024, seed=1)
+    qp.add_circuit("bell", qc1)
+    qp.add_circuit("superposition", qc2)
+    circuit_runs = ["bell","superposition"]
+    qobj = qp.compile(circuit_runs, backend='local_qasm_simulator', shots=1024, seed=1)
     q_job = qiskit.QuantumJob(qobj, preformatted=True)
     # I am not convince the q_job is the correct class i would make a qobj class
     # ideally this should be qobj = qiskit.compile([qc],config) or qobj = QuantumObject([qc]) then qobj.compile
@@ -69,6 +76,7 @@ try:
     # Show the results
     print("simulation: ", sim_result)
     print(sim_result.get_counts("bell"))
+    print(sim_result.get_counts("superposition"))
 
     # Compile and run the Quantum Program on a real device backend
     if remote_backends:
@@ -93,8 +101,10 @@ try:
 
         #compiling the job
         qp = qiskit.QuantumProgram()
-        qp.add_circuit("bell", qc)
-        qobj = qp.compile("bell", backend=best_device['backend'], shots=1024, seed=1)
+        qp.add_circuit("bell", qc1)
+        qp.add_circuit("superposition", qc2)
+        circuit_runs = ["bell","superposition"]
+        qobj = qp.compile(circuit_runs, backend=best_device['backend'], shots=1024, seed=1)
         wait = 5
         timeout = 300
         q_job = qiskit.QuantumJob(qobj, preformatted=True, resources={
@@ -118,6 +128,7 @@ try:
         # Show the results
         print("experiment: ", exp_result)
         print(exp_result.get_counts("bell"))
+        print(sim_result.get_counts("superposition"))
 
 except qiskit.QISKitError as ex:
     print('There was an error in the circuit!. Error = {}'.format(ex))
