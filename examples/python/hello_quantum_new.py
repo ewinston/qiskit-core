@@ -37,26 +37,33 @@ try:
     qc.cx(qr[0], qr[1])
     # Add a Measure gate to see the state.
     qc.measure(qr, cr)
-
-    # Create a Quantum Program for execution
-    qp = qiskit.QuantumProgram()
-    # Add the circuit you created to it, and call it the "bell" circuit.
-    # (You can add multiple circuits to the same program, for batch execution)
-    qp.add_circuit("bell", qc)
-
-    # Compile and run the Quantum Program on a simulator backend
+ 
+    #setting up the backend
     print("(Local Backends)")
     for backend in local_backends:
         print(backend)
     
     my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
+    # ideally this should be 
+    #my_backend = qiskit.backends.get_backend_instance(filter on local and qasm simulator)
+    # backend methods that exsist are .config, .status .calibration and .run and .parameters
+    # new method is .valid 
+
+    #compiling the job
+    qp = qiskit.QuantumProgram()
+    qp.add_circuit("bell", qc)
     qobj = qp.compile("bell", backend='local_qasm_simulator', shots=1024, seed=1)
     q_job = qiskit.QuantumJob(qobj, preformatted=True)
-    sim_result = my_backend.run(q_job)
+    # ideally this should be qobj = qiskit.compile([qc],config)
 
+    #runing the job
+    sim_result = my_backend.run(q_job)
+    #ideally this would be
     #job = my_backend.run(qobj)
-    #job.status()
-    #sim_result=job.results()
+    #job.status
+    #sim_result=job.results
+    # the job is a new object that runs when it does and i dont wait for it to finish and can get results later
+    # other job methods are job.abort
 
 
     # Show the results
@@ -65,6 +72,8 @@ try:
 
     # Compile and run the Quantum Program on a real device backend
     if remote_backends:
+
+
         # see a list of available remote backends
         print("\n(Remote Backends)")
         for backend in remote_backends:
@@ -78,16 +87,28 @@ try:
         best_device = min([x for x in device_status if x['available']==True],
                           key=lambda x:x['pending_jobs'])
         print("Running on current least busy device: ", best_device['backend'])
-
         my_backend = qiskit.backends.get_backend_instance(best_device['backend'])
-    
+        # this gets replaced by 
+        # my_backend = qiskit.backends.get_backend_instance(filter remote, device, smallest queue)
+
+        #compiling the job
         qobj = qp.compile("bell", backend=best_device['backend'], shots=1024, seed=1)
         wait = 5
         timeout = 300
         q_job = qiskit.QuantumJob(qobj, preformatted=True, resources={
                     'max_credits': qobj['config']['max_credits'], 'wait': wait,
                     'timeout': timeout})
+        # ideally this should be qobj = qiskit.compile([qc],config)
+
+        #runing the job
         exp_result = my_backend.run(q_job)
+        
+        #ideally this would be
+        #job = my_backend.run(qobj)
+        #job.status
+        #sim_result=job.results
+        # the job is a new object that runs when it does and i dont wait for it to finish and can get results later
+        # other job methods are job.abort
         #job = my_backend.run(qobj)
         #job.status()
         #exp_result=job.results()
