@@ -42,7 +42,6 @@ try:
     print("(Local Backends)")
     for backend in local_backends:
         print(backend)
-    
     my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
     # ideally this should be 
     #my_backend = qiskit.backends.get_backend_instance(filter on local and qasm simulator)
@@ -54,7 +53,8 @@ try:
     qp.add_circuit("bell", qc)
     qobj = qp.compile("bell", backend='local_qasm_simulator', shots=1024, seed=1)
     q_job = qiskit.QuantumJob(qobj, preformatted=True)
-    # ideally this should be qobj = qiskit.compile([qc],config)
+    # I am not convince the q_job is the correct class i would make a qobj class
+    # ideally this should be qobj = qiskit.compile([qc],config) or qobj = QuantumObject([qc]) then qobj.compile
 
     #runing the job
     sim_result = my_backend.run(q_job)
@@ -100,11 +100,11 @@ try:
         q_job = qiskit.QuantumJob(qobj, preformatted=True, resources={
                     'max_credits': qobj['config']['max_credits'], 'wait': wait,
                     'timeout': timeout})
-        # ideally this should be qobj = qiskit.compile([qc],config)
+        # I am not convince the q_job is the correct class i would make a qobj class
+        # ideally this should be qobj = qiskit.compile([qc],config) or qobj = QuantumObject([qc]) then qobj.compile
 
         #runing the job
         exp_result = my_backend.run(q_job)
-        
         #ideally this would be
         #job = my_backend.run(qobj)
         #job.status
