@@ -27,9 +27,9 @@ try:
     qr = qiskit.QuantumRegister("qr", 2)
     # Create a Classical Register called "cr" with 2 bits.
     cr = qiskit.ClassicalRegister("cr", 2)
+
     # Create a Quantum Circuit called involving "qr" and "cr"
     qc1 = qiskit.QuantumCircuit(qr, cr)
-
     # Add a H gate on qubit 0, putting this qubit in superposition.
     qc1.h(qr[0])
     # Add a CX (CNOT) gate on control qubit 0 and target qubit 1, putting
