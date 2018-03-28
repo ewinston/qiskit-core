@@ -1019,11 +1019,7 @@ class QuantumProgram(object):
                     [control1(int), target1(int)],
                 ]
 
-<<<<<<< HEAD
-                eg. [[0, 2], [1, 2], [3, 2]}
-=======
                 eg. [[0, 2], [1, 2], [3, 2]]
->>>>>>> QISKit/master
 
             initial_layout (dict): A mapping of qubit to qubit::
 
