@@ -92,6 +92,8 @@ try:
         # my_backend = qiskit.backends.get_backend_instance(filter remote, device, smallest queue)
 
         #compiling the job
+        qp = qiskit.QuantumProgram()
+        qp.add_circuit("bell", qc)
         qobj = qp.compile("bell", backend=best_device['backend'], shots=1024, seed=1)
         wait = 5
         timeout = 300
