@@ -128,7 +128,7 @@ try:
         # Show the results
         print("experiment: ", exp_result)
         print(exp_result.get_counts("bell"))
-        print(sim_result.get_counts("superposition"))
+        print(exp_result.get_counts("superposition"))
 
 except qiskit.QISKitError as ex:
     print('There was an error in the circuit!. Error = {}'.format(ex))
