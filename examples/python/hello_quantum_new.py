@@ -7,10 +7,14 @@ used `pip install`, the examples only work from the root directory.
 
 # Import the QISKit SDK
 import qiskit
-# Import the IBMQ Experience API
+# Import the IBM Q Experience API 
 from IBMQuantumExperience import IBMQuantumExperience
+# XXX ideally rather than import IBMQuantumExperience you do sth like:
+# api = qiskit.remote()
 
 # Authenticate for access to remote backends
+# XXX ideally instead of import QConfig we use some localised configuration (windows: registry
+# unix: dotfile, etc)
 try:
     import Qconfig
     api = IBMQuantumExperience(token=Qconfig.APItoken,
@@ -42,16 +46,16 @@ try:
     qc2 = qiskit.QuantumCircuit(qr, cr)
     qc2.h(qr)
     qc2.measure(qr, cr)
- 
+
     #setting up the backend
     print("(Local Backends)")
     for backend in local_backends:
         print(backend)
     my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
-    # ideally this should be 
-    #my_backend = qiskit.backends.get_backend_instance(filter on local and qasm simulator)
-    # backend methods that exsist are .config, .status .calibration and .run and .parameters
-    # new method is .valid 
+    # ideally this should be
+    # my_backend = qiskit.backends.get_backend_instance(filter on local and qasm simulator)
+    # backend methods that exist are .config, .status .calibration and .run and .parameters
+    # new method is .validate which returns a ticket that goes though some simulaitons
 
     #compiling the job
     qp = qiskit.QuantumProgram()
@@ -62,6 +66,10 @@ try:
     q_job = qiskit.QuantumJob(qobj, preformatted=True)
     # I am not convince the q_job is the correct class i would make a qobj class
     # ideally this should be qobj = qiskit.compile([qc],config) or qobj = QuantumObject([qc]) then qobj.compile
+    # set the congig 
+    # with the coupling layout, qubit layout, gate set etc
+    # qobj = qiskit.compile([qc],config) 
+
 
     #runing the job
     sim_result = my_backend.run(q_job)
