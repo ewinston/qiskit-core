@@ -55,18 +55,3 @@ class API(object):
         # Ideally we should give this a url, but while we import the IBMQuantumExperience object
         # I think this the best until we bring functions from IBMQuantumExperience into this object
         self.api = api
-
-    def less_busy(self):
-        """Create an API object."""
-        device_status = []
-        for backend in qiskit.backends.remote_backends():
-            exp_backend = qiskit.backends.get_backend_instance(backend)
-            # print(exp_backend.configuration)
-            if not exp_backend.configuration['simulator']:
-                if not exp_backend.status['backend'] == 'ibmqx_hpc_qasm_simulator':
-                    device_status.append(exp_backend.status)
-        # print(device_status)
-        best_device = min([x for x in device_status if x['available'] == True],
-                          key=lambda x:x['pending_jobs'])
-        backend = qiskit.backends.get_backend_instance(best_device)
-        return backend

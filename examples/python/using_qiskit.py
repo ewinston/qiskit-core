@@ -21,6 +21,9 @@ except:
     print("""WARNING: There's no connection with IBMQuantumExperience servers.
              Have you initialized a Qconfig.py file with your personal token?
              For now, there's only access to local simulator backends...""")
+
+local_backends = qiskit.backends.local_backends()
+remote_backends = qiskit.backends.remote_backends()
 try:
     # Create a Quantum Register called "q" with 2 qubits.
     qubit_reg = qiskit.QuantumRegister("q", 2)
@@ -44,7 +47,7 @@ try:
 
     #setting up the backend
     print("(Local Backends)")
-    for backend in qiskit.backends.local_backends():
+    for backend in local_backends:
         print(backend)
     my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
     # ideally this should be
@@ -82,19 +85,26 @@ try:
     print(sim_result.get_counts("superposition"))
 
     # Compile and run the Quantum Program on a real device backend
-    if qiskit.backends.remote_backends():
+    if remote_backends:
 
 
         # see a list of available remote backends
         print("\n(Remote Backends)")
-        for backend in qiskit.backends.remote_backends():
+        for backend in remote_backends:
             print(backend)
 
         # select least busy available device and execute
-        my_backend = ibmqx.less_busy
+        # select least busy available device and execute
+        device_status = [qiskit.backends.status(backend)
+                         for backend in remote_backends if "simulator" not in backend]
+        try:
+            best_device = min([x for x in device_status if x['available']==True],
+                              key=lambda x:x['pending_jobs'])
+        except:
+            print("All devices are currently unavailable.")
         # this gets replaced by 
+        my_backend  = qiskit.backends.get_backend_instance(best_device['backend'])
         # my_backend = qiskit.backends.get_backend_instance(filter remote, device, smallest queue)
-        print(my_backend)
         
         #compiling the job
         qp = qiskit.QuantumProgram()
