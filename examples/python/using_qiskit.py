@@ -1,5 +1,5 @@
 """
-Example used in the README. In this example a Bell state is made.
+Example showing how to use qiskit.
 
 Note: if you have only cloned the QISKit repository but not
 used `pip install`, the examples only work from the root directory.
@@ -10,13 +10,15 @@ import qiskit
 
 
 # Authenticate for access to remote backends
-# XXX ideally instead of import QConfig we use some localised configuration (windows: registry
+# XXX ideally instead of import QConfig we use some localized configuration (windows: registry
 # unix: dotfile, etc)
 
-#importing the api
+# registering the backends from the IBM Q Experience
+import Qconfig
+qiskit.api.register(Qconfig.APItoken)
 try:
     import Qconfig
-    ibmqx = qiskit.api.register(Qconfig.APItoken)
+    qiskit.api.register(Qconfig.APItoken)
 except:
     print("""WARNING: There's no connection with the API for remote backends.
              Have you initialized a Qconfig.py file with your personal token?
@@ -26,22 +28,17 @@ local_backends = qiskit.backends.local_backends()
 remote_backends = qiskit.backends.remote_backends()
 
 try:
-    # Create a Quantum Register called "q" with 2 qubits.
+    # Create a Quantum and Classical Register.
     qubit_reg = qiskit.QuantumRegister("q", 2)
-    # Create a Classical Register called "c" with 2 bits.
     clbit_reg = qiskit.ClassicalRegister("c", 2)
 
-    # clbit_reg a Quantum Circuit called involving "qubit_reg" and "clbit_reg"
+    # making first circuit: bell state
     qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg)
-    # Add a H gate on qubit 0, putting this qubit in superposition.
     qc1.h(qubit_reg[0])
-    # Add a CX (CNOT) gate on control qubit 0 and target qubit 1, putting
-    # the qubits in a Bell state.
     qc1.cx(qubit_reg[0], qubit_reg[1])
-    # Add a Measure gate to see the state.
     qc1.measure(qubit_reg, clbit_reg)
 
-    # making another circuit of all superpositions
+    # making another circuit: superpositions
     qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg)
     qc2.h(qubit_reg)
     qc2.measure(qubit_reg, clbit_reg)
@@ -54,7 +51,7 @@ try:
     # ideally this should be
     # my_backend = qiskit.backends.get_backend_instance(filter on local and qasm simulator)
     # backend methods that exist are .config, .status .calibration and .run and .parameters
-    # new method is .validate which returns a ticket that goes though some simulaitons
+    # new method is .validate which returns a ticket that goes though some simulators
 
     #compiling the job
     qp = qiskit.QuantumProgram()
@@ -62,6 +59,7 @@ try:
     qp.add_circuit("superposition", qc2)
     circuit_runs = ["bell","superposition"]
     qobj = qp.compile(circuit_runs, backend='local_qasm_simulator', shots=1024, seed=1)
+
     q_job = qiskit.QuantumJob(qobj, preformatted=True)
     # I am not convince the q_job is the correct class i would make a qobj class
     # ideally this should be qobj = qiskit.compile([qc],config) or qobj = QuantumObject([qc]) then qobj.compile

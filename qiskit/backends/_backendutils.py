@@ -95,7 +95,7 @@ def discover_remote_backends(api):
     """Discover backends available from IBM Q
 
     Args:
-        api (IBMQuantumExperience): IBM Q API
+        api: An API object
     Returns:
         list: list of discovered backend names
     """
