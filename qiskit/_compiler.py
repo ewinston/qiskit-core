@@ -20,14 +20,13 @@
 import logging
 
 import random
-import warnings
 import string
 import copy
 
+from qiskit.dagcircuit import DAGCircuit
+from qiskit.unroll import DagUnroller, DAGBackend, JsonBackend
 
-
-import qiskit.mapper as mapper
-import qiskit.backends as backends
+from . import backends
 from . import QISKitError
 from . import Measure
 from . import Gate
@@ -35,17 +34,24 @@ from .extensions.standard.barrier import Barrier
 from . import unroll
 from . import mapper
 
-from . import _openquantumcompiler as openquantumcompiler
-
-
-
 logger = logging.getLogger(__name__)
 
-def compile(list_of_circuits, backend="local_qasm_simulator",
-            config=None, basis_gates=None, coupling_map=None,
-            initial_layout=None, shots=1024, max_credits=10, seed=None,
-            qobj_id=None, hpc=None):
-    """Compile the circuits into the execution list.
+compile_config_default = {
+    'backend': "local_qasm_simulator",
+    'config': None,
+    'basis_gates': None,
+    'coupling_map': None,
+    'initial_layout': None,
+    'shots': 1024,
+    'max_credits': 10,
+    'seed': 1,
+    'qobj_id': None,
+    'hpc': None
+}
+
+
+def compile(list_of_circuits, compile_config=compile_config_default):
+    """Compile a list of circuits into a qobj.
 
     This builds the internal "to execute" list which is list of quantum
     circuits to run on different backends.
@@ -132,18 +138,23 @@ def compile(list_of_circuits, backend="local_qasm_simulator",
             QISKitError: if any of the circuit names cannot be found on the
                 Quantum Program.
 
-        .. deprecated:: 0.5
-            The `coupling_map` parameter as a dictionary will be deprecated in
-            upcoming versions. Using the coupling_map as a list is recommended.
+
         """
     # TODO: Jay: currently basis_gates, coupling_map, initial_layout,
     # shots, max_credits and seed are extra inputs but I would like
     # them to go into the config.
-    if isinstance(coupling_map, dict):
-        coupling_map = mapper.coupling_dict2list(coupling_map)
-        warnings.warn(
-            "coupling_map as a dictionary will be deprecated in upcoming versions (>0.5.0). "
-            "Using the coupling_map as a list recommended.", DeprecationWarning)
+
+    compile_config = {**compile_config_default, **compile_config}
+    backend = compile_config['backend']
+    config = compile_config['config']
+    basis_gates = compile_config['basis_gates']
+    coupling_map = compile_config['coupling_map']
+    initial_layout = compile_config['initial_layout']
+    shots = compile_config['shots']
+    max_credits = compile_config['max_credits']
+    seed = compile_config['seed']
+    qobj_id = compile_config['qobj_id']
+    hpc = compile_config['hpc']
 
     qobj = {}
     if not qobj_id:
@@ -175,8 +186,6 @@ def compile(list_of_circuits, backend="local_qasm_simulator",
 
 
     qobj['circuits'] = []
-    print('here')
-    print(backend)
     backend_conf = backends.configuration(backend)
     if not basis_gates:
         if 'basis_gates' in backend_conf:
@@ -209,7 +218,7 @@ def compile(list_of_circuits, backend="local_qasm_simulator",
                                       'measurement in circuit "{1}"'.format(backend, circuit.name))
             for i, qubit in zip(qasm_idx, measured_qubits):
                 circuit.data.insert(i, Barrier([qubit], circuit))
-        dag_circuit, final_layout = openquantumcompiler.compile(
+        dag_circuit, final_layout = compile_circuit(
             circuit,
             basis_gates=basis_gates,
             coupling_map=coupling_map,
@@ -235,7 +244,7 @@ def compile(list_of_circuits, backend="local_qasm_simulator",
         else:
             job["config"]["seed"] = seed
         # the compiled circuit to be run saved as a dag
-        # we assume that openquantumcompiler has already expanded gates
+        # we assume that compile_circuit has already expanded gates
         # to the target basis, so we just need to generate json
         json_circuit = unroll.DagUnroller(dag_circuit,
                                           unroll.JsonBackend(dag_circuit.basis)).execute()
@@ -247,6 +256,95 @@ def compile(list_of_circuits, backend="local_qasm_simulator",
         # add job to the qobj
         qobj["circuits"].append(job)
     return qobj
+
+
+def compile_circuit(quantum_circuit, basis_gates='u1,u2,u3,cx,id', coupling_map=None,
+                    initial_layout=None, get_layout=False, format='dag'):
+    """Compile the circuit.
+
+    This builds the internal "to execute" list which is list of quantum
+    circuits to run on different backends.
+
+    Args:
+        quantum_circuit (QuantumCircuit): circuit to compile
+        basis_gates (str): a comma seperated string and are the base gates,
+                           which by default are: u1,u2,u3,cx,id
+        coupling_map (list): A graph of coupling::
+
+            [
+             [control0(int), target0(int)],
+             [control1(int), target1(int)],
+            ]
+
+            eg. [[0, 2], [1, 2], [1, 3], [3, 4]}
+
+        initial_layout (dict): A mapping of qubit to qubit::
+
+                              {
+                                ("q", start(int)): ("q", final(int)),
+                                ...
+                              }
+                              eg.
+                              {
+                                ("q", 0): ("q", 0),
+                                ("q", 1): ("q", 1),
+                                ("q", 2): ("q", 2),
+                                ("q", 3): ("q", 3)
+                              }
+        get_layout (bool): flag for returning the layout.
+        format (str): The target format of the compilation:
+            {'dag', 'json', 'qasm'}
+
+    Returns:
+        object: If get_layout == False, the compiled circuit in the specified
+            format. If get_layout == True, a tuple is returned, with the
+            second element being the layout.
+
+    Raises:
+        QISKitCompilerError: if the format is not valid.
+    """
+    compiled_dag_circuit = DAGCircuit.fromQuantumCircuit(quantum_circuit)
+    basis = basis_gates.split(',') if basis_gates else []
+
+    dag_unroller = DagUnroller(compiled_dag_circuit, DAGBackend(basis))
+    compiled_dag_circuit = dag_unroller.expand_gates()
+    final_layout = None
+    # if a coupling map is given compile to the map
+    if coupling_map:
+        logger.info("pre-mapping properties: %s",
+                    compiled_dag_circuit.property_summary())
+        # Insert swap gates
+        coupling = mapper.Coupling(mapper.coupling_list2dict(coupling_map))
+        logger.info("initial layout: %s", initial_layout)
+        compiled_dag_circuit, final_layout = mapper.swap_mapper(
+            compiled_dag_circuit, coupling, initial_layout, trials=20, seed=13)
+        logger.info("final layout: %s", final_layout)
+        # Expand swaps
+        dag_unroller = DagUnroller(compiled_dag_circuit, DAGBackend(basis))
+        compiled_dag_circuit = dag_unroller.expand_gates()
+        # Change cx directions
+        compiled_dag_circuit = mapper.direction_mapper(compiled_dag_circuit, coupling)
+        # Simplify cx gates
+        mapper.cx_cancellation(compiled_dag_circuit)
+        # Simplify single qubit gates
+        compiled_dag_circuit = mapper.optimize_1q_gates(compiled_dag_circuit)
+        logger.info("post-mapping properties: %s",
+                    compiled_dag_circuit.property_summary())
+    # choose output format
+    if format == 'dag':
+        compiled_circuit = compiled_dag_circuit
+    elif format == 'json':
+        dag_unroller = DagUnroller(compiled_dag_circuit,
+                                   JsonBackend(list(compiled_dag_circuit.basis.keys())))
+        compiled_circuit = dag_unroller.execute()
+    elif format == 'qasm':
+        compiled_circuit = compiled_dag_circuit.qasm()
+    else:
+        raise QISKitCompilerError('unrecognized circuit format')
+
+    if get_layout:
+        return compiled_circuit, final_layout
+    return compiled_circuit
 
 
 class QISKitCompilerError(QISKitError):

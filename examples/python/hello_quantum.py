@@ -36,21 +36,20 @@ try:
     # Add a Measure gate to see the state.
     qc.measure(qr, cr)
 
-    # Create a Quantum Program for execution
-    qp = qiskit.QuantumProgram()
-    # Add the circuit you created to it, and call it the "bell" circuit.
-    # (You can add multiple circuits to the same program, for batch execution)
-    qp.add_circuit("bell", qc)
-
     # Compile and run the Quantum Program on a simulator backend
     print("(Local Backends)")
     for backend in local_backends:
-        print(backend)
-    sim_result = qp.execute("bell", backend='local_qasm_simulator', shots=1024, seed=1)
+        backend_status = qiskit.backends.status(backend)
+        print(backend, backend_status)
+    
+    my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
+    qobj = qiskit.compile([qc])
+    my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
+    sim_result = my_backend.run(qiskit.QuantumJob(qobj, preformatted=True))
 
     # Show the results
     print("simulation: ", sim_result)
-    print(sim_result.get_counts("bell"))
+    print(sim_result.get_counts(qc.name))
 
     # Compile and run the Quantum Program on a real device backend
     if remote_backends:
@@ -67,13 +66,27 @@ try:
             best_device = min([x for x in device_status if x['available']==True],
                               key=lambda x:x['pending_jobs'])
             print("Running on current least busy device: ", best_device['backend'])
-            exp_result = qp.execute("bell", backend=best_device['backend'], shots=1024, timeout=300)
+
+            my_backend = qiskit.backends.get_backend_instance(best_device['backend'])
+
+            compile_config = {
+                'backend': best_device['backend'],
+                'shots': 1024,
+                'max_credits': 10
+                }
+            qobj = qiskit.compile([qc],compile_config)
+        
+            #runing the job
+            q_job = qiskit.QuantumJob(qobj, preformatted=True, resources={
+                        'max_credits': qobj['config']['max_credits'], 'wait': 5,
+                        'timeout': 300})
+            exp_result = my_backend.run(q_job)
+                    
+            # Show the results
+            print("experiment: ", exp_result)
+            print(exp_result.get_counts(qc.name))
         except:
             print("All devices are currently unavailable.")
-
-        # Show the results
-        print("experiment: ", exp_result)
-        print(exp_result.get_counts("bell"))
 
 except qiskit.QISKitError as ex:
     print('There was an error in the circuit!. Error = {}'.format(ex))

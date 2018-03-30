@@ -53,7 +53,6 @@ from . import unroll
 from . import qasm
 from . import mapper
 
-from . import _openquantumcompiler as openquantumcompiler
 
 FIRST_CAP_RE = re.compile('(.)([A-Z][a-z]+)')
 ALL_CAP_RE = re.compile('([a-z0-9])([A-Z])')
@@ -999,16 +998,39 @@ class QuantumProgram(object):
                 config=None, basis_gates=None, coupling_map=None,
                 initial_layout=None, shots=1024, max_credits=10, seed=None,
                 qobj_id=None, hpc=None):
-        """Compile the circuits into the execution list."""
+        """Compile the circuits into the execution list.
+        
+        .. deprecated:: 0.5
+            The `coupling_map` parameter as a dictionary will be deprecated in
+            upcoming versions. Using the coupling_map as a list is recommended.
+        """
+
+        if isinstance(coupling_map, dict):
+            coupling_map = mapper.coupling_dict2list(coupling_map)
+            warnings.warn(
+                "coupling_map as a dictionary will be deprecated in upcoming versions (>0.5.0). "
+                "Using the coupling_map as a list recommended.", DeprecationWarning)
+
         list_of_circuits = []
         if isinstance(name_of_circuits, str):
             name_of_circuits = [name_of_circuits]
         for name in name_of_circuits:
             self.__quantum_program[name].name = name
             list_of_circuits.append(self.__quantum_program[name])
-            print(self.__quantum_program[name].name)
-        qobj = qiskit.compile(list_of_circuits, backend, config, basis_gates, coupling_map,
-                              initial_layout, shots, max_credits, seed, qobj_id, hpc)
+
+        compile_config = {
+            'backend': backend,
+            'config': config, 
+            'basis_gates': basis_gates, 
+            'coupling_map': coupling_map,
+            'initial_layout': initial_layout, 
+            'shots': shots, 
+            'max_credits': max_credits, 
+            'seed': seed,
+            'qobj_id': qobj_id, 
+            'hpc': hpc
+        }
+        qobj = qiskit.compile(list_of_circuits, compile_config)
         return qobj
 
     def reconfig(self, qobj, backend=None, config=None, shots=None, max_credits=None, seed=None):

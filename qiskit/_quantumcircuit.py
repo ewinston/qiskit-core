@@ -19,6 +19,8 @@
 Quantum circuit object.
 """
 import itertools
+import random
+import string
 from collections import OrderedDict
 from ._qiskiterror import QISKitError
 from ._register import Register
@@ -49,6 +51,12 @@ class QuantumCircuit(object):
 
     def __init__(self, *regs, name=None):
         """Create a new circuit."""
+        if name is None:
+            name1 = "circuit_random_name_"
+            name2 = "".join([random.choice(string.ascii_letters + string.digits)
+                           for n in range(30)])
+            name = name1+name2
+        # print(name)
         self.name = name
         # Data contains a list of instructions in the order they were applied.
         self.data = []
