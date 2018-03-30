@@ -59,6 +59,7 @@ class API(object):
 
     # Functions to add
     #   status -- gives the status of the api
+    #   available_backends -- all backends in this API, with their config
     # A use case is the user would do
     # ibmqx = qiskit.api.register(token,url)
     # ibmqx.status and it prints the current status of the API

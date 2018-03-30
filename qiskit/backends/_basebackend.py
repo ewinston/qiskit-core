@@ -71,6 +71,6 @@ class BaseBackend(ABC):
 
     @property
     def name(self):
-        """Return backend status"""
+        """Return backend name"""
         backend_name = self.configuration['name']
-        return {'backend': backend_name} 
+        return {'backend': backend_name}
