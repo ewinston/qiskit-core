@@ -47,5 +47,6 @@ from ._result import Result
 
 from . import backends
 from . import api
+from ._compiler import compile
 
 __version__ = '0.5.0'

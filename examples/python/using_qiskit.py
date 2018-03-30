@@ -15,10 +15,10 @@ import qiskit
 
 # registering the backends from the IBM Q Experience
 import Qconfig
-qiskit.api.register(Qconfig.APItoken)
+#qiskit.api.register(Qconfig.APItoken)
 try:
     import Qconfig
-    qiskit.api.register(Qconfig.APItoken)
+    #qiskit.api.register(Qconfig.APItoken)
 except:
     print("""WARNING: There's no connection with the API for remote backends.
              Have you initialized a Qconfig.py file with your personal token?
