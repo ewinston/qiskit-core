@@ -9,36 +9,34 @@ used `pip install`, the examples only work from the root directory.
 import qiskit
 import qiskit.api
 
-import Qconfig
-
 #importing the api
 try:
     import Qconfig
-    qiskit.api.register(Qconfig.APItoken)
+    ibmqx = qiskit.api.register(Qconfig.APItoken)
 except:
     print("""WARNING: There's no connection with IBMQuantumExperience servers.
              Have you initialized a Qconfig.py file with your personal token?
              For now, there's only access to local simulator backends...""")
 try:
-    # Create a Quantum Register called "qr" with 2 qubits.
-    qr = qiskit.QuantumRegister("qr", 2)
-    # Create a Classical Register called "cr" with 2 bits.
-    cr = qiskit.ClassicalRegister("cr", 2)
+    # Create a Quantum Register called "q" with 2 qubits.
+    qubit_reg = qiskit.QuantumRegister("q", 2)
+    # Create a Classical Register called "c" with 2 bits.
+    clbit_reg = qiskit.ClassicalRegister("c", 2)
 
-    # Create a Quantum Circuit called involving "qr" and "cr"
-    qc1 = qiskit.QuantumCircuit(qr, cr)
+    # clbit_reg a Quantum Circuit called involving "qubit_reg" and "clbit_reg"
+    qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg)
     # Add a H gate on qubit 0, putting this qubit in superposition.
-    qc1.h(qr[0])
+    qc1.h(qubit_reg[0])
     # Add a CX (CNOT) gate on control qubit 0 and target qubit 1, putting
     # the qubits in a Bell state.
-    qc1.cx(qr[0], qr[1])
+    qc1.cx(qubit_reg[0], qubit_reg[1])
     # Add a Measure gate to see the state.
-    qc1.measure(qr, cr)
+    qc1.measure(qubit_reg, clbit_reg)
 
     # making another circuit of all superpositions
-    qc2 = qiskit.QuantumCircuit(qr, cr)
-    qc2.h(qr)
-    qc2.measure(qr, cr)
+    qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg)
+    qc2.h(qubit_reg)
+    qc2.measure(qubit_reg, clbit_reg)
 
     #setting up the backend
     print("(Local Backends)")
@@ -61,7 +59,7 @@ try:
     # ideally this should be qobj = qiskit.compile([qc],config) or qobj = QuantumObject([qc]) then qobj.compile
     # set the congig 
     # with the coupling layout, qubit layout, gate set etc
-    # qobj = qiskit.compile([qc],config) 
+    # qobj = qiskit.compile([qc],config)
 
 
     #runing the job
@@ -86,20 +84,14 @@ try:
         # see a list of available remote backends
         print("\n(Remote Backends)")
         for backend in qiskit.backends.remote_backends():
-            exp_backend = qiskit.backends.get_backend_instance(backend)
-            backend_status = exp_backend.status
-            print(backend, backend_status)
+            print(backend)
 
         # select least busy available device and execute
-        device_status = [backend.status
-                         for backend in qiskit.backends.remote_backends() if "simulator" not in backend]
-        best_device = min([x for x in device_status if x['available']==True],
-                          key=lambda x:x['pending_jobs'])
-        print("Running on current least busy device: ", best_device['backend'])
-        my_backend = qiskit.backends.get_backend_instance(best_device['backend'])
+        my_backend = ibmqx.less_busy
         # this gets replaced by 
         # my_backend = qiskit.backends.get_backend_instance(filter remote, device, smallest queue)
-
+        print(my_backend)
+        
         #compiling the job
         qp = qiskit.QuantumProgram()
         qp.add_circuit("bell", qc1)
