@@ -5,23 +5,15 @@ Note: if you have only cloned the QISKit repository but not
 used `pip install`, the examples only work from the root directory.
 """
 
-# Import the QISKit SDK
+# Import the QISKit
 import qiskit
 import qiskit.api
-# Import the IBM Q Experience API 
-from IBMQuantumExperience import IBMQuantumExperience
-# XXX ideally rather than import IBMQuantumExperience you do sth like:
-# api = qiskit.remote()
 
-# Authenticate for access to remote backends
-# XXX ideally instead of import QConfig we use some localised configuration (windows: registry
-# unix: dotfile, etc)
-qiskit.api
 import Qconfig
 
+#importing the api
 try:
     import Qconfig
-    
     qiskit.api.register(Qconfig.APItoken)
 except:
     print("""WARNING: There's no connection with IBMQuantumExperience servers.

@@ -21,10 +21,17 @@ import qiskit.backends
 from IBMQuantumExperience import IBMQuantumExperience
 
 
-def register(token, url='https://quantumexperience.ng.bluemix.net/api'):
+def register(token, url='https://quantumexperience.ng.bluemix.net/api', hub=None,
+             group=None, project=None):
     """Return the filename.
     """
-    api_temp = IBMQuantumExperience(token, config={'url': url})
+    config = {
+        'url': url,
+        'hub': hub,
+        'group': group,
+        'project': project
+    }
+    api_temp = IBMQuantumExperience(token, config)
     api = API(api_temp)
     qiskit.backends.discover_remote_backends(api_temp)
 
