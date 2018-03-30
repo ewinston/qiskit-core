@@ -7,9 +7,10 @@ used `pip install`, the examples only work from the root directory.
 
 # Import the QISKit
 import qiskit
-import qiskit.api
 
-import Qconfig
+# Authenticate for access to remote backends
+# XXX ideally instead of import QConfig we use some localised configuration (windows: registry
+# unix: dotfile, etc)
 
 #importing the api
 try:
