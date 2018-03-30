@@ -18,12 +18,13 @@ try:
     import Qconfig
     ibmqx = qiskit.api.register(Qconfig.APItoken)
 except:
-    print("""WARNING: There's no connection with IBMQuantumExperience servers.
+    print("""WARNING: There's no connection with the API for remote backends.
              Have you initialized a Qconfig.py file with your personal token?
              For now, there's only access to local simulator backends...""")
 
 local_backends = qiskit.backends.local_backends()
 remote_backends = qiskit.backends.remote_backends()
+
 try:
     # Create a Quantum Register called "q" with 2 qubits.
     qubit_reg = qiskit.QuantumRegister("q", 2)

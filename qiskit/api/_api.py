@@ -23,7 +23,7 @@ from IBMQuantumExperience import IBMQuantumExperience
 
 def register(token, url='https://quantumexperience.ng.bluemix.net/api', hub=None,
              group=None, project=None):
-    """Return the filename.
+    """Return a API object.
     """
     config = {
         'url': url,
@@ -37,14 +37,15 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api', hub=None
 
     # Ideally this would make a API object based on url and the user token
     # and register all the backends of this API to qiskit.backends.remote()
-    # I am worried that there is not checks is the backends have the same name
+    # I am worried that there is not checks to see if the backends have the same name
     # this should be verified in the future.
     return api
 
 class API(object):
     """Creates a API object."""
 
-    # Functions to add status -- gives the status of the api
+    # Functions to add
+    #   status -- gives the status of the api
     # A use case is the user would do
     # ibmqx = qiskit.api.register(token,url)
     # ibmqx.status and it prints the current status of the API
