@@ -61,6 +61,7 @@ try:
 
         try:
             # select least busy available device and execute. This should become a function
+            # this we should make a method to get the best backend
             device_status = [qiskit.backends.status(backend)
                              for backend in remote_backends if "simulator" not in backend]
 

@@ -9,7 +9,7 @@ used `pip install`, the examples only work from the root directory.
 
 # Import the QISKit
 import qiskit
-
+import pprint
 
 # Authenticate for access to remote backends
 # XXX ideally instead of import QConfig we use some localized configuration (windows: registry
@@ -28,9 +28,9 @@ local_backends = qiskit.backends.local_backends()
 remote_backends = qiskit.backends.remote_backends()
 
 try:
-    # Create a Quantum and Classical Register.
-    qubit_reg = qiskit.QuantumRegister("q", 2)
-    clbit_reg = qiskit.ClassicalRegister("c", 2)
+    # Create a Quantum and Classical Register and giving a name.
+    qubit_reg = qiskit.QuantumRegister(2, name='q')
+    clbit_reg = qiskit.ClassicalRegister(2, name='c')
 
     # making first circuit: bell state
     qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name="bell")
@@ -51,13 +51,13 @@ try:
     my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
     # ideally this should be a filter
     # my_backend = qiskit.backends.get_backend_instance(filter on local and qasm simulator)
-    # backend methods that exist are 
-    #   .configuration  -- the configuration of the backend
-    #   .status -- the status of the backen
-    #   .calibration  -- the calibration data
-    #   .parameters -- the parameters data
-    #   .validate -- validate that a qobj can run on the backend
-    #   .run -- runs a qobj
+    print("(Local QASM Simulator Configuration) ")
+    pprint.pprint(my_backend.configuration)
+    print("(Local QASM Simulator calibration) ")
+    pprint.pprint(my_backend.calibration)
+    print("(Local QASM Simulator parameters) ")
+    pprint.pprint(my_backend.parameters)
+
 
     #compiling the job
     qobj = qiskit.compile([qc1,qc2])
@@ -78,8 +78,8 @@ try:
 
     # Show the results
     print("simulation: ", sim_result)
-    print(sim_result.get_counts("bell"))
-    print(sim_result.get_counts("superposition"))
+    print(sim_result.get_counts(qc1))
+    print(sim_result.get_counts(qc2))
 
     # Compile and run the Quantum Program on a real device backend
     if remote_backends:
@@ -90,17 +90,24 @@ try:
             backend_status = qiskit.backends.status(backend)
             print(backend, backend_status)
 
-        
         try:
             # select least busy available device and execute
+            # this we should make a method to get the best backend
             device_status = [qiskit.backends.status(backend)
                              for backend in remote_backends if "simulator" not in backend]
-            best_device = min([x for x in device_status if x['available']==True],
+            best_device = min([x for x in device_status if x['available'] is True],
                               key=lambda x:x['pending_jobs'])
 
             my_backend  = qiskit.backends.get_backend_instance(best_device['backend'])
             # my_backend = qiskit.backends.get_backend_instance(filter remote, device, smallest queue)
             print("Running on current least busy device: ", best_device['backend'])
+
+            print("(with Configuration) ")
+            pprint.pprint(my_backend.configuration)
+            print("(with calibration) ")
+            pprint.pprint(my_backend.calibration)
+            print("(with parameters) ")
+            pprint.pprint(my_backend.parameters)
 
             #compiling the job
             compile_config = {
@@ -129,8 +136,8 @@ try:
 
             # Show the results
             print("experiment: ", exp_result)
-            print(exp_result.get_counts("bell"))
-            print(exp_result.get_counts("superposition"))
+            print(exp_result.get_counts(qc1))
+            print(exp_result.get_counts(qc2))
 
         except:
             print("All devices are currently unavailable.")

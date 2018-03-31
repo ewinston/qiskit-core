@@ -22,19 +22,19 @@ remote_backends = qiskit.backends.remote_backends()
 
 try:
     # Create a Quantum Register with 2 qubits.
-    qr = qiskit.QuantumRegister(2)
+    q = qiskit.QuantumRegister(2)
     # Create a Classical Register with 2 bits.
-    cr = qiskit.ClassicalRegister(2)
+    c = qiskit.ClassicalRegister(2)
     # Create a Quantum Circuit
-    qc = qiskit.QuantumCircuit(qr, cr)
+    qc = qiskit.QuantumCircuit(q, c)
 
     # Add a H gate on qubit 0, putting this qubit in superposition.
-    qc.h(qr[0])
+    qc.h(q[0])
     # Add a CX (CNOT) gate on control qubit 0 and target qubit 1, putting
     # the qubits in a Bell state.
-    qc.cx(qr[0], qr[1])
+    qc.cx(q[0], q[1])
     # Add a Measure gate to see the state.
-    qc.measure(qr, cr)
+    qc.measure(q, c)
 
     # Compile and run the Quantum Program on a simulator backend
     print("(Local Backends)")
@@ -57,6 +57,7 @@ try:
 
         try:
             # select least busy available device and execute
+            # this we should make a method to get the best backend
             device_status = [qiskit.backends.status(backend)
                              for backend in remote_backends if "simulator" not in backend]
             best_device = min([x for x in device_status if x['available'] is True],
