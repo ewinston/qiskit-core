@@ -72,8 +72,8 @@ class API(object):
 
         # Ideally we should give this a url, but while we import the IBMQuantumExperience object
         # I think this the best until we bring functions from IBMQuantumExperience into this object
-        self.api = api
+        self._api = api
 
     def available_backends(self):
         """Returns the backends on the api"""
-        return self.api.available_backends()
+        return self._api.available_backends()
