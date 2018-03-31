@@ -1,7 +1,7 @@
 """
 Example showing how to use qiskit at level 2.
 
-See level 1 if you would like to understand how to compile 
+See level 1 if you would like to understand how to compile
 
 Note: if you have only cloned the QISKit repository but not
 used `pip install`, the examples only work from the root directory.
@@ -24,17 +24,17 @@ remote_backends = qiskit.backends.remote_backends()
 
 try:
     # Create a Quantum and Classical Register.
-    qubit_reg = qiskit.QuantumRegister("q", 2)
-    clbit_reg = qiskit.ClassicalRegister("c", 2)
+    qubit_reg = qiskit.QuantumRegister('q', 2)
+    clbit_reg = qiskit.ClassicalRegister('c', 2)
 
     # making first circuit: bell state
-    qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name="bell")
+    qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg)
     qc1.h(qubit_reg[0])
     qc1.cx(qubit_reg[0], qubit_reg[1])
     qc1.measure(qubit_reg, clbit_reg)
 
     # making another circuit: superpositions
-    qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name="superposition")
+    qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg)
     qc2.h(qubit_reg)
     qc2.measure(qubit_reg, clbit_reg)
 
@@ -48,8 +48,8 @@ try:
 
     # Show the results
     print("simulation: ", sim_result)
-    print(sim_result.get_counts("bell"))
-    print(sim_result.get_counts("superposition"))
+    print(sim_result.get_counts(qc1))
+    print(sim_result.get_counts(qc2))
 
     # Compile and run the Quantum Program on a real device backend
     if remote_backends:
@@ -80,8 +80,8 @@ try:
 
             # Show the results
             print("experiment: ", exp_result)
-            print(exp_result.get_counts("bell"))
-            print(exp_result.get_counts("superposition"))
+            print(exp_result.get_counts(qc1))
+            print(exp_result.get_counts(qc2))
         except:
             print("All devices are currently unavailable.")
 except qiskit.QISKitError as ex:

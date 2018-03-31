@@ -21,11 +21,11 @@ local_backends = qiskit.backends.local_backends()
 remote_backends = qiskit.backends.remote_backends()
 
 try:
-    # Create a Quantum Register called "qr" with 2 qubits.
-    qr = qiskit.QuantumRegister("qr", 2)
-    # Create a Classical Register called "cr" with 2 bits.
-    cr = qiskit.ClassicalRegister("cr", 2)
-    # Create a Quantum Circuit called involving "qr" and "cr"
+    # Create a Quantum Register with 2 qubits.
+    qr = qiskit.QuantumRegister('q', 2)
+    # Create a Classical Register with 2 bits.
+    cr = qiskit.ClassicalRegister('c', 2)
+    # Create a Quantum Circuit
     qc = qiskit.QuantumCircuit(qr, cr)
 
     # Add a H gate on qubit 0, putting this qubit in superposition.
@@ -46,7 +46,7 @@ try:
 
     # Show the results
     print("simulation: ", sim_result)
-    print(sim_result.get_counts(qc.name))
+    print(sim_result.get_counts(qc))
 
     # Compile and run the Quantum Program on a real device backend
     if remote_backends:
@@ -75,7 +75,7 @@ try:
 
             # Show the results
             print("experiment: ", exp_result)
-            print(exp_result.get_counts(qc.name))
+            print(exp_result.get_counts(qc))
         except:
             print("All devices are currently unavailable.")
 

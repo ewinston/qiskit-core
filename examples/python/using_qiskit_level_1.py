@@ -33,13 +33,13 @@ try:
     clbit_reg = qiskit.ClassicalRegister("c", 2)
 
     # making first circuit: bell state
-    qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name = "bell")
+    qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name="bell")
     qc1.h(qubit_reg[0])
     qc1.cx(qubit_reg[0], qubit_reg[1])
     qc1.measure(qubit_reg, clbit_reg)
 
     # making another circuit: superpositions
-    qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name = "superposition" )
+    qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name="superposition")
     qc2.h(qubit_reg)
     qc2.measure(qubit_reg, clbit_reg)
 
@@ -90,17 +90,18 @@ try:
             backend_status = qiskit.backends.status(backend)
             print(backend, backend_status)
 
-        # select least busy available device and execute
-        device_status = [qiskit.backends.status(backend)
-                         for backend in remote_backends if "simulator" not in backend]
+        
         try:
+            # select least busy available device and execute
+            device_status = [qiskit.backends.status(backend)
+                             for backend in remote_backends if "simulator" not in backend]
             best_device = min([x for x in device_status if x['available']==True],
                               key=lambda x:x['pending_jobs'])
 
             my_backend  = qiskit.backends.get_backend_instance(best_device['backend'])
             # my_backend = qiskit.backends.get_backend_instance(filter remote, device, smallest queue)
-         
             print("Running on current least busy device: ", best_device['backend'])
+
             #compiling the job
             compile_config = {
                 'backend': best_device['backend'],
