@@ -152,7 +152,7 @@ def compile(list_of_circuits=None, compile_config=COMPILE_CONFIG_DEFAULT):
         # making the job to be added to qobj
         job = {}
         job["name"] = circuit.name
-         # config parameters used by the runner
+        # config parameters used by the runner
         if config is None:
             config = {}  # default to empty config dict
         job["config"] = copy.deepcopy(config)
@@ -270,6 +270,7 @@ def compile_circuit(quantum_circuit, basis_gates='u1,u2,u3,cx,id', coupling_map=
     if get_layout:
         return compiled_circuit, final_layout
     return compiled_circuit
+
 
 def execute(list_of_circuits, compile_config=COMPILE_CONFIG_DEFAULT, wait=5, timeout=60):
     """Executes a set of circuits.

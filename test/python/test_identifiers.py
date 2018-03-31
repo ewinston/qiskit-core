@@ -285,27 +285,26 @@ class TestAnonymousIds(QiskitTestCase):
         self.assertTrue(qobj2['circuits'][1]['config']['xvals'] == [
             'only for qobj2', 2, 3, 4])
 
-    #def test_add_circuit_noname(self):
-        #"""Test add two circuits without names. Also tests get_counts without circuit name.
-
-
-        #CANT WORK OUT WHAT THIS DOES
-        #"""
-        #q_program = QuantumProgram()
-        #qr = q_program.create_quantum_register(size=2)
-       # cr = q_program.create_classical_register(size=2)
-       # qc1 = q_program.create_circuit(qregisters=[qr], cregisters=[cr])
-        #qc2 = q_program.create_circuit(qregisters=[qr], cregisters=[cr])
-        #qc1.h(qr[0])
-        #qc1.measure(qr[0], cr[0])
-       # qc2.measure(qr[1], cr[1])
-       # new_circuit = qc1 + qc2
-       # q_program.add_circuit(quantum_circuit=new_circuit)
-       # backend = 'local_qasm_simulator'  # the backend to run on
-        #shots = 1024  # the number of shots in the experiment.
-        #result = q_program.execute(backend=backend, shots=shots, seed=78)
-        #self.assertEqual(result.get_counts(new_circuit.name), {'01': 519, '00': 505})
-        #self.assertRaises(QISKitError, result.get_counts)
+    # def test_add_circuit_noname(self):
+        # """Test add two circuits without names. Also tests get_counts without circuit name.
+        #
+        # CANT WORK OUT WHAT THIS DOES
+        # """
+        # q_program = QuantumProgram()
+        # qr = q_program.create_quantum_register(size=2)
+        # cr = q_program.create_classical_register(size=2)
+        # qc1 = q_program.create_circuit(qregisters=[qr], cregisters=[cr])
+        # qc2 = q_program.create_circuit(qregisters=[qr], cregisters=[cr])
+        # qc1.h(qr[0])
+        # qc1.measure(qr[0], cr[0])
+        # qc2.measure(qr[1], cr[1])
+        # new_circuit = qc1 + qc2
+        # q_program.add_circuit(quantum_circuit=new_circuit)
+        # backend = 'local_qasm_simulator'  # the backend to run on
+        # shots = 1024  # the number of shots in the experiment.
+        # result = q_program.execute(backend=backend, shots=shots, seed=78)
+        # self.assertEqual(result.get_counts(new_circuit.name), {'01': 519, '00': 505})
+        # self.assertRaises(QISKitError, result.get_counts)
 
 
 class TestZeroIds(QiskitTestCase):

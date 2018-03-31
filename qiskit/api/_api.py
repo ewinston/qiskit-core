@@ -56,6 +56,7 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api',
 
     return api
 
+
 class API(object):
     """Creates an API object."""
 
@@ -76,4 +77,3 @@ class API(object):
     def available_backends(self):
         """Returns the backends on the api"""
         return self.api.available_backends()
- 

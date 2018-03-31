@@ -995,7 +995,7 @@ class QuantumProgram(object):
                 initial_layout=None, shots=1024, max_credits=10, seed=None,
                 qobj_id=None, hpc=None):
         """Compile the circuits into the execution list.
-        
+
         .. deprecated:: 0.5
             The `coupling_map` parameter as a dictionary will be deprecated in
             upcoming versions. Using the coupling_map as a list is recommended.
@@ -1017,14 +1017,14 @@ class QuantumProgram(object):
 
         compile_config = {
             'backend': backend,
-            'config': config, 
-            'basis_gates': basis_gates, 
+            'config': config,
+            'basis_gates': basis_gates,
             'coupling_map': coupling_map,
-            'initial_layout': initial_layout, 
-            'shots': shots, 
-            'max_credits': max_credits, 
+            'initial_layout': initial_layout,
+            'shots': shots,
+            'max_credits': max_credits,
             'seed': seed,
-            'qobj_id': qobj_id, 
+            'qobj_id': qobj_id,
             'hpc': hpc
         }
         qobj = qiskit.compile(list_of_circuits, compile_config)
