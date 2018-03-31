@@ -16,7 +16,7 @@
 # limitations under the License.
 # =============================================================================
 
-"""Tools for compiling Quantum Programs."""
+"""Tools for compiling a batch of quantum circuits."""
 import logging
 
 import random
@@ -30,13 +30,15 @@ from . import backends
 from . import QISKitError
 from . import Measure
 from . import Gate
+from . import QuantumCircuit
 from .extensions.standard.barrier import Barrier
 from . import unroll
 from . import mapper
+from ._quantumjob import QuantumJob
 
 logger = logging.getLogger(__name__)
 
-compile_config_default = {
+COMPILE_CONFIG_DEFAULT = {
     'backend': "local_qasm_simulator",
     'config': None,
     'basis_gates': None,
@@ -50,101 +52,23 @@ compile_config_default = {
 }
 
 
-def compile(list_of_circuits, compile_config=compile_config_default):
+def compile(list_of_circuits, compile_config=COMPILE_CONFIG_DEFAULT):
     """Compile a list of circuits into a qobj.
 
-    This builds the internal "to execute" list which is list of quantum
-    circuits to run on different backends.
-
     Args:
-            list_of_circuits (list[hashable] or hashable or None): circuit
-                names to be compiled. If None, all the circuits will be compiled.
-            backend (str): a string representing the backend to compile to.
-            config (dict): a dictionary of configurations parameters for the
-                compiler.
-            basis_gates (str): a comma separated string and are the base gates,
-                which by default are provided by the backend.
-            coupling_map (list): A graph of coupling::
+        list_of_circuits (list[QuantumCircuits]): list of circuits
+        compile_config (dict): a dictionary of compile configurations.
 
-                [
-                    [control0(int), target0(int)],
-                    [control1(int), target1(int)],
-                ]
+    Returns:
+        obj: the qobj
 
-                eg. [[0, 2], [1, 2], [3, 2]]
-
-            initial_layout (dict): A mapping of qubit to qubit::
-
-                {
-                ("q", start(int)): ("q", final(int)),
-                ...
-                }
-                eg.
-                {
-                ("q", 0): ("q", 0),
-                ("q", 1): ("q", 1),
-                ("q", 2): ("q", 2),
-                ("q", 3): ("q", 3)
-                }
-
-            shots (int): the number of shots
-            max_credits (int): the max credits to use 3, or 5
-            seed (int): the initial seed the simulators use
-            qobj_id (str): identifier of the qobj.
-            hpc (dict): This will setup some parameter for
-                ibmqx_hpc_qasm_simulator, using a JSON-like format like::
-
-                    {
-                        'multi_shot_optimization': Boolean,
-                        'omp_num_threads': Numeric
-                    }
-
-                This parameter MUST be used only with
-                ibmqx_hpc_qasm_simulator, otherwise the SDK will warn
-                the user via logging, and set the value to None.
-
-        Returns:
-            dict: the job id and populates the qobj::
-
-            qobj =
-                {
-                    id: --job id (string),
-                    config: -- dictionary of config settings (dict)--,
-                        {
-                        "max_credits" (online only): -- credits (int) --,
-                        "shots": -- number of shots (int) --.
-                        "backend": -- backend name (str) --
-                        }
-                    circuits:
-                        [
-                            {
-                            "name": --circuit name (string)--,
-                            "compiled_circuit": --compiled quantum circuit (JSON format)--,
-                            "compiled_circuit_qasm": --compiled quantum circuit (QASM format)--,
-                            "config": --dictionary of additional config settings (dict)--,
-                                {
-                                "coupling_map": --adjacency list (list)--,
-                                "basis_gates": --comma separated gate names (string)--,
-                                "layout": --layout computed by mapper (dict)--,
-                                "seed": (simulator only)--initial seed for the simulator (int)--,
-                                }
-                            },
-                            ...
-                        ]
-                }
-
-        Raises:
-            ValueError: if no names of the circuits have been specified.
-            QISKitError: if any of the circuit names cannot be found on the
-                Quantum Program.
-
-
-        """
-    # TODO: Jay: currently basis_gates, coupling_map, initial_layout,
-    # shots, max_credits and seed are extra inputs but I would like
-    # them to go into the config.
-
-    compile_config = {**compile_config_default, **compile_config}
+    Raises:
+        QISKitError: if any of the circuit names cannot be found on the
+            Quantum Program.
+    """
+    if isinstance(list_of_circuits, QuantumCircuit):
+        list_of_circuits = [list_of_circuits]
+    compile_config = {**COMPILE_CONFIG_DEFAULT, **compile_config}
     backend = compile_config['backend']
     config = compile_config['config']
     basis_gates = compile_config['basis_gates']
@@ -183,7 +107,6 @@ def compile(list_of_circuits, compile_config=compile_config_default):
                     'but you are not using ibmqx_hpc_qasm_simulator, so we will '
                     'ignore it.')
         hpc = None
-
 
     qobj['circuits'] = []
     backend_conf = backends.configuration(backend)
@@ -345,6 +268,29 @@ def compile_circuit(quantum_circuit, basis_gates='u1,u2,u3,cx,id', coupling_map=
     if get_layout:
         return compiled_circuit, final_layout
     return compiled_circuit
+
+def execute(list_of_circuits, compile_config=COMPILE_CONFIG_DEFAULT, wait=5, timeout=60):
+    """Executes a set of circuits.
+
+    Args:
+        list_of_circuits (list[QuantumCircuits]): list of circuits
+
+        wait (int): XXX
+        timeout (int): XXX
+        compile_config (dict): a dictionary of compile configurations.
+
+    Returns:
+        obj: The results object
+    """
+
+    backend = compile_config['backend']
+    my_backend = backends.get_backend_instance(backend)
+    qobj = compile(list_of_circuits, compile_config)
+
+    q_job = QuantumJob(qobj, preformatted=True, resources={
+        'max_credits': qobj['config']['max_credits'], 'wait': wait, 'timeout': timeout})
+    result = my_backend.run(q_job)
+    return result
 
 
 class QISKitCompilerError(QISKitError):

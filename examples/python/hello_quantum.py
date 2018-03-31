@@ -43,7 +43,8 @@ try:
         print(backend, backend_status)
     
     my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
-    qobj = qiskit.compile([qc])
+    qobj = qiskit.compile(qc)
+    
     my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
     sim_result = my_backend.run(qiskit.QuantumJob(qobj, preformatted=True))
 

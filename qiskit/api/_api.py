@@ -25,7 +25,7 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api',
     """
     Register a user with an API. By calling this method, all available
     backends from this API are registered into QISKit.
-    Defualt API is the IBM Q Experience.
+    Default API is the IBM Q Experience.
 
     Args:
         token (str): user authentication token
