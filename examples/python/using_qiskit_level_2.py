@@ -1,5 +1,7 @@
 """
-Example showing how to use qiskit.
+Example showing how to use qiskit at level 2.
+
+See level 1 if you would like to understand how to compile 
 
 Note: if you have only cloned the QISKit repository but not
 used `pip install`, the examples only work from the root directory.
@@ -32,7 +34,7 @@ try:
     qc1.measure(qubit_reg, clbit_reg)
 
     # making another circuit: superpositions
-    qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name="superposition" )
+    qc2 = qiskit.QuantumCircuit(qubit_reg, clbit_reg, name="superposition")
     qc2.h(qubit_reg)
     qc2.measure(qubit_reg, clbit_reg)
 
@@ -42,7 +44,7 @@ try:
         print(backend)
 
     # runing the job
-    sim_result = qiskit.execute([qc1,qc2])
+    sim_result = qiskit.execute([qc1, qc2])
 
     # Show the results
     print("simulation: ", sim_result)
@@ -62,11 +64,12 @@ try:
             device_status = [qiskit.backends.status(backend)
                              for backend in remote_backends if "simulator" not in backend]
 
-            best_device = min([x for x in device_status if x['available']==True],
-                              key=lambda x:x['pending_jobs'])
+            best_device = min([x for x in device_status if x['available'] is True],
+                              key=lambda x: x['pending_jobs'])
 
-            my_backend  = qiskit.backends.get_backend_instance(best_device['backend'])
+            my_backend = qiskit.backends.get_backend_instance(best_device['backend'])
             print("Running on current least busy device: ", best_device['backend'])
+
             # running the job
             compile_config = {
                 'backend': best_device['backend'],
@@ -74,6 +77,7 @@ try:
                 'max_credits': 10
                 }
             exp_result = qiskit.execute([qc1, qc2], compile_config, wait=5, timeout=300)
+
             # Show the results
             print("experiment: ", exp_result)
             print(exp_result.get_counts("bell"))

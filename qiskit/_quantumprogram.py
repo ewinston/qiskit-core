@@ -26,7 +26,6 @@ import os
 import string
 import re
 from threading import Event
-import copy
 import warnings
 
 # use the external IBMQuantumExperience Library
@@ -43,9 +42,6 @@ from . import QuantumCircuit
 from . import QISKitError
 from . import JobProcessor
 from . import QuantumJob
-from . import Measure
-from . import Gate
-from .extensions.standard.barrier import Barrier
 from ._logging import set_qiskit_logger, unset_qiskit_logger
 
 # Beta Modules

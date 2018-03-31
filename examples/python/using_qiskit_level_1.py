@@ -1,6 +1,8 @@
 """
 Example showing how to use qiskit.
 
+In QISKit 0.6 we will be working on a pass manager for level 0 users
+
 Note: if you have only cloned the QISKit repository but not
 used `pip install`, the examples only work from the root directory.
 """

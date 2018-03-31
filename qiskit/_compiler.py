@@ -28,9 +28,9 @@ from qiskit.unroll import DagUnroller, DAGBackend, JsonBackend
 
 from . import backends
 from . import QISKitError
-from . import Measure
-from . import Gate
-from . import QuantumCircuit
+from ._measure import Measure
+from ._gate import Gate
+from ._quantumcircuit import QuantumCircuit
 from .extensions.standard.barrier import Barrier
 from . import unroll
 from . import mapper
@@ -55,12 +55,14 @@ COMPILE_CONFIG_DEFAULT = {
 def compile(list_of_circuits, compile_config=COMPILE_CONFIG_DEFAULT):
     """Compile a list of circuits into a qobj.
 
+    XXX THIS FUNCTION WILL BE REWRITTEN IN VERSION 0.6
+
     Args:
         list_of_circuits (list[QuantumCircuits]): list of circuits
         compile_config (dict): a dictionary of compile configurations.
 
     Returns:
-        obj: the qobj
+        obj: the qobj to be run on the backends
 
     Raises:
         QISKitError: if any of the circuit names cannot be found on the
@@ -275,8 +277,8 @@ def execute(list_of_circuits, compile_config=COMPILE_CONFIG_DEFAULT, wait=5, tim
     Args:
         list_of_circuits (list[QuantumCircuits]): list of circuits
 
-        wait (int): XXX
-        timeout (int): XXX
+        wait (int): XXX -- I DONT THINK WE NEED TO KEEP THIS
+        timeout (int): XXX -- I DONT THINK WE NEED TO KEEP THIS
         compile_config (dict): a dictionary of compile configurations.
 
     Returns:

@@ -19,7 +19,7 @@
 
 import copy
 import numpy
-from qiskit._qiskiterror import QISKitError
+from qiskit import QISKitError
 
 
 class Result(object):

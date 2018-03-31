@@ -5,7 +5,7 @@ Note: if you have only cloned the QISKit repository but not
 used `pip install`, the examples only work from the root directory.
 """
 
-# Import the QISKit SDK
+# Import the QISKit
 import qiskit
 
 # Authenticate for access to remote backends
@@ -39,14 +39,10 @@ try:
     # Compile and run the Quantum Program on a simulator backend
     print("(Local Backends)")
     for backend in local_backends:
-        backend_status = qiskit.backends.status(backend)
-        print(backend, backend_status)
-    
-    my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
-    qobj = qiskit.compile(qc)
-    
-    my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
-    sim_result = my_backend.run(qiskit.QuantumJob(qobj, preformatted=True))
+        print(backend)
+
+    # runing the job
+    sim_result = qiskit.execute(qc)
 
     # Show the results
     print("simulation: ", sim_result)
@@ -57,32 +53,26 @@ try:
         # see a list of available remote backends
         print("\n(Remote Backends)")
         for backend in remote_backends:
-            backend_status = qiskit.backends.status(backend)
-            print(backend, backend_status)
+            print(backend)
 
-        # select least busy available device and execute
-        device_status = [qiskit.backends.status(backend)
-                         for backend in remote_backends if "simulator" not in backend]
         try:
-            best_device = min([x for x in device_status if x['available']==True],
-                              key=lambda x:x['pending_jobs'])
+            # select least busy available device and execute
+            device_status = [qiskit.backends.status(backend)
+                             for backend in remote_backends if "simulator" not in backend]
+            best_device = min([x for x in device_status if x['available'] is True],
+                              key=lambda x: x['pending_jobs'])
             print("Running on current least busy device: ", best_device['backend'])
 
             my_backend = qiskit.backends.get_backend_instance(best_device['backend'])
 
+            #runing the job
             compile_config = {
                 'backend': best_device['backend'],
                 'shots': 1024,
                 'max_credits': 10
                 }
-            qobj = qiskit.compile([qc],compile_config)
-        
-            #runing the job
-            q_job = qiskit.QuantumJob(qobj, preformatted=True, resources={
-                        'max_credits': qobj['config']['max_credits'], 'wait': 5,
-                        'timeout': 300})
-            exp_result = my_backend.run(q_job)
-                    
+            exp_result = qiskit.execute(qc, compile_config, wait=5, timeout=300)
+
             # Show the results
             print("experiment: ", exp_result)
             print(exp_result.get_counts(qc.name))

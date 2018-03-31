@@ -29,7 +29,7 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api',
 
     Args:
         token (str): user authentication token
-        url (str): API's url
+        url (str): the url to the API
         hub (str): optional user hub
         group (str): optional user group
         project (str): optional user project
@@ -74,5 +74,6 @@ class API(object):
         self.api = api
 
     def available_backends(self):
+        """Returns the backends on the api"""
         return self.api.available_backends()
  
