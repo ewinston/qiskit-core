@@ -36,12 +36,10 @@ try:
     # Add a Measure gate to see the state.
     qc.measure(q, c)
 
-    # Compile and run the Quantum Program on a simulator backend
-    print("(Local Backends)")
-    for backend in local_backends:
-        print(backend)
+    # See a list of available local simulators
+    print("Local backends: ", qiskit.backends.local_backends())
 
-    # runing the job
+    # Compile and run the Quantum circuit on a simulator backend
     sim_result = qiskit.execute(qc)
 
     # Show the results
@@ -51,9 +49,7 @@ try:
     # Compile and run the Quantum Program on a real device backend
     if remote_backends:
         # see a list of available remote backends
-        print("\n(Remote Backends)")
-        for backend in remote_backends:
-            print(backend)
+        print("Remote backends: ", qiskit.backends.remote_backends())
 
         try:
             # select least busy available device and execute
