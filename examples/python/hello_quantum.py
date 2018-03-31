@@ -22,9 +22,9 @@ remote_backends = qiskit.backends.remote_backends()
 
 try:
     # Create a Quantum Register with 2 qubits.
-    qr = qiskit.QuantumRegister('q', 2)
+    qr = qiskit.QuantumRegister(2)
     # Create a Classical Register with 2 bits.
-    cr = qiskit.ClassicalRegister('c', 2)
+    cr = qiskit.ClassicalRegister(2)
     # Create a Quantum Circuit
     qc = qiskit.QuantumCircuit(qr, cr)
 

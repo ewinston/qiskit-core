@@ -24,8 +24,8 @@ remote_backends = qiskit.backends.remote_backends()
 
 try:
     # Create a Quantum and Classical Register.
-    qubit_reg = qiskit.QuantumRegister('q', 2)
-    clbit_reg = qiskit.ClassicalRegister('c', 2)
+    qubit_reg = qiskit.QuantumRegister(2)
+    clbit_reg = qiskit.ClassicalRegister(2)
 
     # making first circuit: bell state
     qc1 = qiskit.QuantumCircuit(qubit_reg, clbit_reg)
