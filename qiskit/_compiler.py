@@ -52,7 +52,7 @@ COMPILE_CONFIG_DEFAULT = {
 }
 
 
-def compile(list_of_circuits, compile_config=COMPILE_CONFIG_DEFAULT):
+def compile(list_of_circuits=None, compile_config=COMPILE_CONFIG_DEFAULT):
     """Compile a list of circuits into a qobj.
 
     XXX THIS FUNCTION WILL BE REWRITTEN IN VERSION 0.6

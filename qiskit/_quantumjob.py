@@ -19,7 +19,7 @@
 """Quantum Job class"""
 import random
 import string
-#import qiskit.backends as backends
+from . import backends
 from qiskit.unroll import Unroller, DagUnroller, JsonBackend
 from qiskit.dagcircuit import DAGCircuit
 from qiskit import QuantumCircuit
