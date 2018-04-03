@@ -22,8 +22,6 @@
 # First, check for required Python and API version
 from . import _util
 
-from IBMQuantumExperience import RegisterSizeError
-
 from ._qiskiterror import QISKitError
 from ._classicalregister import ClassicalRegister
 from ._quantumregister import QuantumRegister
