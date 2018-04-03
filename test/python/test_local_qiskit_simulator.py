@@ -29,7 +29,7 @@ from qiskit import ClassicalRegister
 from qiskit import QuantumCircuit
 from qiskit import QuantumJob
 from qiskit import QuantumRegister
-from qiskit import _openquantumcompiler as openquantumcompiler
+from qiskit._compiler import compile_circuit
 from .common import QiskitTestCase
 
 
@@ -54,10 +54,8 @@ class TestLocalQiskitSimulator(QiskitTestCase):
         qc.measure(qr[0], cr[0])
         self.qc = qc
         # create qobj
-        compiled_circuit1 = openquantumcompiler.compile(self.qc,
-                                                        format='json')
-        compiled_circuit2 = openquantumcompiler.compile(self.qasm_circ,
-                                                        format='json')
+        compiled_circuit1 = compile_circuit(self.qc, format='json')
+        compiled_circuit2 = compile_circuit(self.qasm_circ, format='json')
         self.qobj = {'id': 'test_qobj',
                      'config': {
                          'max_credits': 3,
