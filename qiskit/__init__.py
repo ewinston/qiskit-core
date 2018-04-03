@@ -45,6 +45,9 @@ from ._result import Result
 
 from ._compiler import compile  # pylint: disable=redefined-builtin
 from ._compiler import execute
-from . import api
+
+from ._backend_manager import register
+from ._backend_manager import API
+
 
 __version__ = '0.5.0'
