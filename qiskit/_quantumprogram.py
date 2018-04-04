@@ -40,15 +40,14 @@ from ._quantumregister import QuantumRegister
 from ._classicalregister import ClassicalRegister
 from ._quantumcircuit import QuantumCircuit
 from ._qiskiterror import QISKitError
-from ._jobprocessor import JobProcessor
-from ._quantumjob import QuantumJob
 from ._logging import set_qiskit_logger, unset_qiskit_logger
 
 # Beta Modules
 from .unroll import CircuitBackend, Unroller
-from . import qasm
-from . import mapper
-
+from .qasm import Qasm
+from .mapper import coupling_dict2list
+from ._jobprocessor import JobProcessor
+from ._quantumjob import QuantumJob
 
 FIRST_CAP_RE = re.compile('(.)([A-Z][a-z]+)')
 ALL_CAP_RE = re.compile('([a-z0-9])([A-Z])')
@@ -106,7 +105,6 @@ class QuantumProgram(object):
         self.__quantum_program = {}  # stores all the quantum programs
         self.__init_circuit = None  # stores the initial quantum circuit of the program
         self.__counter = itertools.count()
-        self.mapper = mapper
         if specs:
             self.__init_specs(specs)
 
@@ -432,7 +430,7 @@ class QuantumProgram(object):
             raise QISKitError('qasm file "{0}" not found'.format(qasm_file))
         if not name:
             name = os.path.splitext(os.path.basename(qasm_file))[0]
-        node_circuit = qasm.Qasm(filename=qasm_file).parse()  # Node (AST)
+        node_circuit = Qasm(filename=qasm_file).parse()  # Node (AST)
         logger.info("circuit name: %s", name)
         logger.info("******************************")
         logger.info(node_circuit.qasm())
@@ -455,7 +453,7 @@ class QuantumProgram(object):
             str: Adds a quantum circuit with the gates given in the qasm string to
             the quantum program.
         """
-        node_circuit = qasm.Qasm(data=qasm_string).parse()  # Node (AST)
+        node_circuit = Qasm(data=qasm_string).parse()  # Node (AST)
         if not name:
             # Get a random name if none is given
             name = "".join([random.choice(string.ascii_letters + string.digits)
@@ -530,7 +528,7 @@ class QuantumProgram(object):
 
             for circuit in elements_loaded:
                 circuit_qasm = elements_loaded[circuit]["qasm"]
-                elements_loaded[circuit] = qasm.Qasm(data=circuit_qasm).parse()
+                elements_loaded[circuit] = Qasm(data=circuit_qasm).parse()
             self.__quantum_program = elements_loaded
 
             return {"status": 'Done', 'result': self.__quantum_program}
@@ -1004,7 +1002,7 @@ class QuantumProgram(object):
         """
 
         if isinstance(coupling_map, dict):
-            coupling_map = mapper.coupling_dict2list(coupling_map)
+            coupling_map = coupling_dict2list(coupling_map)
             warnings.warn(
                 "coupling_map as a dictionary will be deprecated in upcoming versions (>0.5.0). "
                 "Using the coupling_map as a list recommended.", DeprecationWarning)

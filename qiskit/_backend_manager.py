@@ -15,15 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =============================================================================
-
+"""
+backend manager.
+"""
 import qiskit.backends
 
 
 def register(token, url='https://quantumexperience.ng.bluemix.net/api',
              hub=None, group=None, project=None):
-    """
-    Register a user with an API. By calling this method, all available
-    backends from this API are registered into QISKit.
+    """Register the backends remote backens to my backends.
+
     Default API is the IBM Q Experience.
 
     Args:
@@ -34,7 +35,7 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api',
         project (str): optional user project
 
     Returns:
-        : an api object
+        dict: of being done
     """
     config = {
         'url': url,
@@ -44,36 +45,8 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api',
     }
     from IBMQuantumExperience import IBMQuantumExperience
     api_temp = IBMQuantumExperience(token, config)
-    api = API(api_temp)
     qiskit.backends.discover_remote_backends(api_temp)
-    # ally this would make an API object based on url and the user token
-    # and register all the backends of this API to qiskit.backends.remote()
-    # I am worried that there is not checks to see if the backends have the same name
-    # this should be verified in the future.the input to the discover_remote_backends 
-    # should be the api not api_temp
-
-    # Ide
-
-    return api
-
-
-class API(object):
-    """Creates an API object."""
-
-    # Functions to add
-    #   status -- gives the status of the api
-    #   available_backends -- all backends in this API, with their config
-    # A use case is the user would do
-    # ibmqx = qiskit.api.register(token,url)
-    # ibmqx.status and it prints the current status of the API
-
-    def __init__(self, api):
-        """Create an API object."""
-
-        # Ideally we should give this a url, but while we import the IBMQuantumExperience object
-        # I think this the best until we bring functions from IBMQuantumExperience into this object
-        self._api = api
-
-    def available_backends(self):
-        """Returns the backends on the api"""
-        return self._api.available_backends()
+    # Ideally this would make not make the IBM quantum experience and register it directly
+    # I want to move discover_remote_backends(api_temp) code here as i
+    # dont think we need backendutils
+    return {'STATUS': 'Done'}

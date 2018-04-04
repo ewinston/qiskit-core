@@ -19,11 +19,15 @@
 """Quantum Job class"""
 import random
 import string
-from .unroll import Unroller, DagUnroller, JsonBackend
-from .dagcircuit import DAGCircuit
+
+# stable modules
 from ._quantumcircuit import QuantumCircuit
 from .qasm import Qasm
 from . import backends
+
+# beta modules
+from .unroll import Unroller, DagUnroller, JsonBackend
+from .dagcircuit import DAGCircuit
 
 
 class QuantumJob():

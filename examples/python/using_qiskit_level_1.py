@@ -90,8 +90,7 @@ try:
             backend_status = qiskit.backends.status(backend)
             print(backend, backend_status)
 
-        #try:
-        if remote_backends:
+        try:
             # select least busy available device and execute
             # this we should make a method to get the best backend
             device_status = [qiskit.backends.status(backend)
@@ -140,7 +139,7 @@ try:
             print(exp_result.get_counts(qc1))
             print(exp_result.get_counts(qc2))
 
-        #except:
+        except:
             print("All devices are currently unavailable.")
 
 except qiskit.QISKitError as ex:

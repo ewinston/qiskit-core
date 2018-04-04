@@ -23,20 +23,22 @@ import random
 import string
 import copy
 
-from .dagcircuit import DAGCircuit
-from .unroll import DagUnroller, DAGBackend, JsonBackend
-
-from . import backends
+# Stable Modules
 from ._qiskiterror import QISKitError
 from ._measure import Measure
 from ._gate import Gate
 from ._quantumcircuit import QuantumCircuit
-from .unroll import Unroller, CircuitBackend
+from .qasm import Qasm
+
+
+# Beta Modules
+from .dagcircuit import DAGCircuit
+from .unroll import DagUnroller, DAGBackend, JsonBackend, Unroller, CircuitBackend
+from . import backends
 from .extensions.standard.barrier import Barrier
 from .mapper import (Coupling, optimize_1q_gates, coupling_list2dict, swap_mapper,
                      cx_cancellation, direction_mapper)
 from ._quantumjob import QuantumJob
-from .qasm import Qasm
 
 
 logger = logging.getLogger(__name__)
