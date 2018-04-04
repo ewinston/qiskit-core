@@ -44,14 +44,13 @@ class IbmQ(BaseBackend):
     """
     _api = None
 
-    def __init__(self, configuration=None):
+    def __init__(self, configuration=None, merge=True):
         """Initialize remote backend for IBM Quantum Experience.
 
         Args:
             configuration (dict, optional): configuration of backend
         """
-        super().__init__(configuration)
-        self._configuration = configuration
+        super().__init__(configuration=configuration, merge=merge)
         if self._configuration:
             self._configuration['local'] = False
 

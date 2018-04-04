@@ -24,6 +24,7 @@ import os
 import pkgutil
 import re
 from collections import namedtuple
+from types import ModuleType
 
 import qiskit
 from ._basebackend import BaseBackend
@@ -134,8 +135,8 @@ def discover_remote_backends(api_):
     Returns:
         list: list of discovered backend names
     """
-    from ._qeremote import QeRemote
-    QeRemote.set_api(api_)
+    from ._ibmq import IbmQ
+    IbmQ.set_api(api_)
     config_list = api_.available_backends()
     backend_name_list = []
     for config in config_list:
@@ -155,7 +156,7 @@ def discover_remote_backends(api_):
         if 'coupling_map' not in config_edit.keys() and config['simulator']:
             config_edit['coupling_map'] = 'all-to-all'
         registered_backend = RegisteredBackend(backend_name,
-                                               QeRemote,
+                                               IbmQ,
                                                config_edit)
         _REGISTERED_BACKENDS[backend_name] = registered_backend
     return backend_name_list
@@ -240,6 +241,11 @@ def register_backend(cls, configuration=None):
             raise QISKitError('Could not register backend: invalid configuration')
 
         # insert backend reference
+        if backend_name in _REGISTERED_BACKENDS:
+
+            raise QISKitError(
+                'backend name "{}" has already been registered'.format(
+                    backend_name))
         registered_backend = RegisteredBackend(
             backend_name, cls, backend_instance.configuration)
         _REGISTERED_BACKENDS[backend_name] = registered_backend
@@ -249,7 +255,7 @@ def register_backend(cls, configuration=None):
     elif len(backend_name_list) > 1:
         return backend_name_list
     else:
-        return None
+        raise QISKitError('Could not register backend for this class')
 
 
 def deregister_backend(backend_name):
@@ -413,5 +419,8 @@ def remote_backends():
     return [backend.name for backend in _REGISTERED_BACKENDS.values()
             if backend.configuration.get('local') is False]
 
+def available_backends():
+    """Get all available backend names."""
+    return [backend.name for backend in _REGISTERED_BACKENDS.values()]
 
 discover_local_backends()
