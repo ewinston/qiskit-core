@@ -46,6 +46,14 @@ class BaseBackend(ABC):
         """Run a QuantumJob on the the backend."""
         pass
 
+    @classmethod
+    def available_backends(cls, configuration=None):
+        """
+        Used to git a list of backend configurations for classes of the
+        derived type.
+        """
+        return []
+    
     @property
     def configuration(self):
         """Return backend configuration"""

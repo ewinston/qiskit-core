@@ -17,7 +17,7 @@
 # =============================================================================
 
 import qiskit.backends
-
+from collections import namedtuple
 
 def register(token, url='https://quantumexperience.ng.bluemix.net/api',
              hub=None, group=None, project=None):

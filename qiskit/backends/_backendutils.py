@@ -27,12 +27,12 @@ from collections import namedtuple
 
 import qiskit
 from ._basebackend import BaseBackend
-from .. import QISKitError
+from qiskit import QISKitError
 
 logger = logging.getLogger(__name__)
 
 RegisteredBackend = namedtuple('RegisteredBackend',
-                               ['name', 'cls', 'configuration', 'api'])
+                               ['name', 'cls', 'configuration'])
 
 _REGISTERED_BACKENDS = {}
 """dict (backend_name: RegisteredBackend) with the available backends.
@@ -84,12 +84,47 @@ def discover_local_backends(directory=os.path.dirname(__file__)):
                         backend_name = register_backend(cls)
                         backend_name_list.append(backend_name)
                         importlib.import_module(fullname)
-                    except QISKitError:
+                    except QISKitError as err:
                         # Ignore backends that could not be initialized.
                         logger.info(
                             'backend %s could not be initialized', fullname)
     return backend_name_list
 
+def discover_backend_classes(package, configuration=None):
+    """This function attempts to discover all backend modules.
+
+    Scope is limited to modules which have been imported and so are in
+    sys.modules
+    """
+    backend_name_list = []
+    for _, name, _ in pkgutil.walk_packages(package.__file__):
+            fullname = package.__name__ + '.' + name
+            modspec = importlib.util.find_spec(fullname)
+            try:
+                mod = importlib.util.module_from_spec(modspec)
+                modspec.loader.exec_module(mod)
+            except Exception as err:
+                logger.info('error checking for backend in {}'.format(
+                    fullname))
+                continue
+            for _, cls in inspect.getmembers(mod, inspect.isclass):
+                if 'qiskit.backends' in fullname:
+                    print(cls)
+                # Iterate through the classes defined on the module.
+                if (issubclass(cls, BaseBackend) and
+                        cls.__module__ == modspec.name):
+                    try:
+                        backend_name = register_backend(cls, configuration=configuration)
+                        if backend_name is not None:
+                            importlib.import_module(fullname)
+                            backend_name_list.extend(backend_name if isinstance(
+                                backend_name, list) else [backend_name])
+                    except QISKitError:
+                        # Ignore backends that could not be initialized.
+                        logger.info(
+                            'backend %s could not be initialized', fullname)
+    return backend_name_list
+        
 
 def discover_remote_backends(api_):
     """Discover backends available from IBM Q
@@ -121,8 +156,7 @@ def discover_remote_backends(api_):
             config_edit['coupling_map'] = 'all-to-all'
         registered_backend = RegisteredBackend(backend_name,
                                                QeRemote,
-                                               config_edit,
-                                               api_)
+                                               config_edit)
         _REGISTERED_BACKENDS[backend_name] = registered_backend
     return backend_name_list
 
@@ -152,7 +186,7 @@ def update_backends(api_=None):
     return backend_name_list
 
 
-def register_backend(cls, configuration_=None, api_=None):
+def register_backend(cls, configuration=None):
     """Register a backend in the list of available backends.
 
     Register a `cls` backend in the `_REGISTERED_BACKENDS` dict, validating
@@ -163,9 +197,8 @@ def register_backend(cls, configuration_=None, api_=None):
 
     Args:
         cls (class): a subclass of BaseBackend that contains a backend
-        configuration_ (dict): backend configuration to use instead of class'
+        configuration (dict): backend configuration to use instead of class'
             default.
-        api_ (obj): an API object
 
     Returns:
         string: the identifier of the backend
@@ -183,24 +216,40 @@ def register_backend(cls, configuration_=None, api_=None):
     if not issubclass(cls, BaseBackend):
         raise QISKitError('Could not register backend: %s is not a subclass '
                           'of BaseBackend' % cls)
-    try:
-        backend_instance = cls(configuration=configuration_)
-    except Exception as err:
-        raise QISKitError('Could not register backend: %s could not be '
-                          'instantiated: %s' % (cls, err))
 
-    # Verify that it has a minimal valid configuration.
-    try:
-        backend_name = backend_instance.configuration['name']
-    except (LookupError, TypeError):
-        raise QISKitError('Could not register backend: invalid configuration')
+    # check to see if class provides configurations.
+    available_backends = getattr(cls, 'available_backends', None)
+    if callable(available_backends):
+        available_configurations = available_backends(configuration=configuration)
+    else:
+        available_configurations = [configuration]
+    if available_configurations == []:
+        available_configurations = [None]
+    backend_name_list = []
+    for conf in available_configurations:
+        try:
+            backend_instance = cls(configuration=conf)
+        except Exception as err:
+            raise QISKitError('Could not register backend: %s could not be '
+                              'instantiated: %s' % (cls, err))
 
-    # Append the backend to the `_backend_classes` dict.
-    registered_backend = RegisteredBackend(
-        backend_name, cls, backend_instance.configuration, api_)
-    _REGISTERED_BACKENDS[backend_name] = registered_backend
+        # Verify that it has a minimal valid configuration.
+        try:
+            backend_name = backend_instance.configuration['name']
+        except (LookupError, TypeError):
+            raise QISKitError('Could not register backend: invalid configuration')
 
-    return backend_name
+        # insert backend reference
+        registered_backend = RegisteredBackend(
+            backend_name, cls, backend_instance.configuration)
+        _REGISTERED_BACKENDS[backend_name] = registered_backend
+        backend_name_list.append(backend_name)
+    if len(backend_name_list) == 1:
+        return backend_name_list[0]
+    elif len(backend_name_list) > 1:
+        return backend_name_list
+    else:
+        return None
 
 
 def deregister_backend(backend_name):
