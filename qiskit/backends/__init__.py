@@ -17,6 +17,7 @@
 
 """Utilities for using backends."""
 from ._basebackend import BaseBackend
+"""
 from ._backendutils import (get_backend_class,
                             get_backend_instance,
                             configuration,
@@ -30,4 +31,4 @@ from ._backendutils import (get_backend_class,
                             deregister_backend,
                             update_backends,
                             discover_local_backends,
-                            discover_remote_backends)
+                            discover_remote_backends)"""

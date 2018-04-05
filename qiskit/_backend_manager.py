@@ -26,10 +26,10 @@ import pkgutil
 from collections import namedtuple
 from types import ModuleType
 
-import qiskit
-import qiskit.backends
-from qiskit.backends import BaseBackend
-from qiskit import QISKitError
+#import qiskit
+#import qiskit.backends
+from .backends import BaseBackend
+from ._qiskiterror import QISKitError
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ as its contents are a combination of:
         
 
 def register(token, url='https://quantumexperience.ng.bluemix.net/api',
-             hub=None, group=None, project=None, package=qiskit):
+             hub=None, group=None, project=None, package=None):
     """Register backends from the specified package.
 
     By calling this method, all available backends from this package
