@@ -24,8 +24,8 @@ except:
              Have you initialized a Qconfig.py file with your personal token?
              For now, there's only access to local simulator backends...""")
 
-local_backends = qiskit.backends.local_backends()
-remote_backends = qiskit.backends.remote_backends()
+local_backends = qiskit.local_backends()
+remote_backends = qiskit.remote_backends()
 
 try:
     # Create a Quantum and Classical Register and giving a name.

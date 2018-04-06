@@ -21,8 +21,8 @@ backend manager.
 import importlib
 import inspect
 import logging
-import os
 import pkgutil
+import copy
 from collections import namedtuple
 from types import ModuleType
 
@@ -52,7 +52,7 @@ as its contents are a combination of:
   backends.
 * backends registered manually by the user by :func:`register_backend`.
 """
-        
+
 
 def register(token, url='https://quantumexperience.ng.bluemix.net/api',
              hub=None, group=None, project=None, package=None):
@@ -84,18 +84,7 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api',
                                      'config': config}}
     return discover_backend_classes(package,
                                     configuration=configuration)
-    # from IBMQuantumExperience import IBMQuantumExperience
-    # api_temp = IBMQuantumExperience(token, config)
-    # api = API(api_temp)
-    # qiskit.backends.discover_remote_backends(api_temp)
 
-    # ally this would make an API object based on url and the user token
-    # and register all the backends of this API to qiskit.backends.remote()
-    # I am worried that there is not checks to see if the backends have the same name
-    # this should be verified in the future.the input to the discover_remote_backends 
-    # should be the api not api_temp
-
-    # Ide
 
 def discover_backend_classes(package, configuration=None):
     """This function attempts to discover all backend classes in the specified
@@ -212,18 +201,40 @@ def register_backend(cls, configuration=None):
 
 def local_backends():
     """Get the local backends."""
-    return [backend.name for backend in _REGISTERED_BACKENDS.values()
-            if backend.configuration.get('local') is True]
+    return available_backends({'local': True})
 
 
 def remote_backends():
     """Get the remote backends."""
-    return [backend.name for backend in _REGISTERED_BACKENDS.values()
-            if backend.configuration.get('local') is False]
+    return available_backends({'local': False})
 
-def available_backends():
+def available_backends(conf_dict=None):
     """Get all available backend names."""
-    return [backend.name for backend in _REGISTERED_BACKENDS.values()]
+    list_of_backends = [backend.name for backend in _REGISTERED_BACKENDS.values()]    
+    if conf_dict:
+        if "local" in conf_dict:
+            list_of_backends_temp = copy.deepcopy(list_of_backends)
+            for backend_name in list_of_backends_temp:
+                backend = get_backend(backend_name)
+                if conf_dict['local']:
+                    if not backend.configuration['local']:                        
+                        list_of_backends.remove(backend_name)
+                else:
+                    if backend.configuration['local']:
+                        list_of_backends.remove(backend_name)
+                
+        if "simulator" in conf_dict:
+            list_of_backends_temp = copy.deepcopy(list_of_backends)
+            for backend_name in list_of_backends_temp:
+                backend = get_backend(backend_name)  
+                if conf_dict['simulator']:
+                    if not backend.configuration['simulator']:
+                        list_of_backends.remove(backend_name)
+                else:
+                    if backend.configuration['simulator']:
+                        list_of_backends.remove(backend_name)
+    return list_of_backends
+
 
 def get_backend(backend_name):
     """Return a backend instance for the named backend.
@@ -243,24 +254,3 @@ def get_backend(backend_name):
             configuration=registered_backend.configuration)
     except KeyError:
         raise LookupError('backend "{}" is not available'.format(backend_name))
-    
-# class API(object):
-#     """Creates an API object."""
-
-#     # Functions to add
-#     #   status -- gives the status of the api
-#     #   available_backends -- all backends in this API, with their config
-#     # A use case is the user would do
-#     # ibmqx = qiskit.api.register(token,url)
-#     # ibmqx.status and it prints the current status of the API
-
-#     def __init__(self, api):
-#         """Create an API object."""
-
-#         # Ideally we should give this a url, but while we import the IBMQuantumExperience object
-#         # I think this the best until we bring functions from IBMQuantumExperience into this object
-#         self._api = api
-
-#     def available_backends(self):
-#         """Returns the backends on the api"""
-#         return self._api.available_backends()

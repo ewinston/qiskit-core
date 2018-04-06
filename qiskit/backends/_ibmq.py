@@ -52,6 +52,13 @@ class IbmQ(BaseBackend):
         """
         super().__init__(configuration=configuration, merge=merge)
         if self._configuration:
+            configuration_edit = {}
+            for key, vals in self._configuration.items():
+                new_key = _snake_case_to_camel_case(key)
+                configuration_edit[new_key] = vals
+            if configuration_edit['name'] == 'ibmqx_hpc_qasm_simulator':
+                configuration_edit['simulator'] = True
+            self._configuration = configuration_edit
             self._configuration['local'] = False
 
     @classmethod
@@ -129,11 +136,6 @@ class IbmQ(BaseBackend):
         job_result['backend'] = qobj['config']['backend']
         this_result = Result(job_result, qobj)
         return this_result
-
-    @classmethod
-    def set_api(cls, api):
-        """Associate API with class"""
-        cls._api = api
 
     @property
     def calibration(self):

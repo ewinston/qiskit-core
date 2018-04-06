@@ -34,7 +34,7 @@ from .qasm import Qasm
 # Beta Modules
 from .dagcircuit import DAGCircuit
 from .unroll import DagUnroller, DAGBackend, JsonBackend, Unroller, CircuitBackend
-from . import backends
+from ._backend_manager import get_backend
 from .extensions.standard.barrier import Barrier
 from .mapper import (Coupling, optimize_1q_gates, coupling_list2dict, swap_mapper,
                      cx_cancellation, direction_mapper)
@@ -76,7 +76,7 @@ def execute(list_of_circuits, backend, compile_config=None,
     compile_config = compile_config or {}
     compile_config = {**COMPILE_CONFIG_DEFAULT, **compile_config}
     compile_config['backend'] = backend
-    my_backend = backends.get_backend_instance(backend)
+    my_backend = get_backend(backend)
     qobj = compile(list_of_circuits, compile_config)
 
     # XXX When qobj is done this should replace q_job
@@ -119,6 +119,8 @@ def compile(list_of_circuits=None, compile_config=None):
     qobj_id = compile_config['qobj_id']
     hpc = compile_config['hpc']
 
+    my_backend = get_backend(backend)
+    
     qobj = {}
     if not qobj_id:
         qobj_id = "".join([random.choice(string.ascii_letters + string.digits)
@@ -148,7 +150,7 @@ def compile(list_of_circuits=None, compile_config=None):
         hpc = None
 
     qobj['circuits'] = []
-    backend_conf = backends.configuration(backend)
+    backend_conf = my_backend.configuration
     if not basis_gates:
         if 'basis_gates' in backend_conf:
             basis_gates = backend_conf['basis_gates']
