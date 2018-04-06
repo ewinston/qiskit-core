@@ -17,12 +17,14 @@ except:
              Have you initialized a Qconfig.py file with your personal token?
              For now, there's only access to local simulator backends...""")
 
-def lowest_pending_jobs(remote_backends):
-    device_status = [qiskit.get_backend(backend).status for backend in remote_backends]
 
-    best_device = min([x for x in device_status if x['available'] is True], 
-                       key=lambda x: x['pending_jobs'])
-    return best_device['backend']
+def lowest_pending_jobs(list_of_backends):
+    """Returns the backend with lowest pending jobs."""
+    device_status = [qiskit.get_backend(backend).status for backend in list_of_backends]
+
+    best = min([x for x in device_status if x['available'] is True],
+               key=lambda x: x['pending_jobs'])
+    return best['backend']
 
 try:
     # Create a Quantum Register with 2 qubits.
@@ -51,15 +53,12 @@ try:
     print(sim_result.get_counts(qc))
 
     # see a list of available remote backends
-    remote_backends=qiskit.available_backends({'local': False, 'simulator': False})
+    remote_backends = qiskit.available_backends({'local': False, 'simulator': False})
 
     print("Remote backends: ", remote_backends)
     # Compile and run the Quantum Program on a real device backend
-    #try:
-    if True:
+    try:
         best_device = lowest_pending_jobs(remote_backends)
-
-        my_backend = qiskit.get_backend(best_device)
         print("Running on current least busy device: ", best_device)
 
         #runing the job
@@ -67,13 +66,12 @@ try:
             'shots': 1024,
             'max_credits': 10
             }
-        print(qc.qasm())
         exp_result = qiskit.execute(qc, best_device, compile_config, wait=5, timeout=300)
 
         # Show the results
         print("experiment: ", exp_result)
         print(exp_result.get_counts(qc))
-    #except:
+    except:
         print("All devices are currently unavailable.")
 
 except qiskit.QISKitError as ex:

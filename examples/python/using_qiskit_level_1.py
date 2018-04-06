@@ -7,25 +7,26 @@ Note: if you have only cloned the QISKit repository but not
 used `pip install`, the examples only work from the root directory.
 """
 
-# Import the QISKit
-import qiskit
 import pprint
 
-# Authenticate for access to remote backends
-# XXX ideally instead of import QConfig we use some localized configuration (windows: registry
-# unix: dotfile, etc)
-
-# registering the backends from the IBM Q Experience
+# Import the QISKit
+import qiskit
 try:
     import Qconfig
-    qiskit.register(Qconfig.APItoken)
+    qiskit.register(Qconfig.APItoken, package=qiskit)
 except:
     print("""WARNING: There's no connection with the API for remote backends.
              Have you initialized a Qconfig.py file with your personal token?
              For now, there's only access to local simulator backends...""")
 
-local_backends = qiskit.local_backends()
-remote_backends = qiskit.remote_backends()
+
+def lowest_pending_jobs(list_of_backends):
+    """Returns the backend with lowest pending jobs."""
+    device_status = [qiskit.get_backend(backend).status for backend in list_of_backends]
+
+    best = min([x for x in device_status if x['available'] is True],
+               key=lambda x: x['pending_jobs'])
+    return best['backend']
 
 try:
     # Create a Quantum and Classical Register and giving a name.
@@ -45,12 +46,10 @@ try:
 
     # Setting up the backend
     print("(Local Backends)")
-    for backend in local_backends:
-        backend_status = qiskit.backends.status(backend)
-        print(backend, backend_status)
-    my_backend = qiskit.backends.get_backend_instance('local_qasm_simulator')
-    # ideally this should be a filter
-    # my_backend = qiskit.backends.get_backend_instance(filter on local and qasm simulator)
+    for backend_name in qiskit.available_backends({'local': True}):
+        backend = qiskit.get_backend(backend_name)
+        print(backend.status)
+    my_backend = qiskit.get_backend('local_qasm_simulator')
     print("(Local QASM Simulator configuration) ")
     pprint.pprint(my_backend.configuration)
     print("(Local QASM Simulator calibration) ")
@@ -60,7 +59,7 @@ try:
 
 
     # Compiling the job
-    qobj = qiskit.compile([qc1,qc2])
+    qobj = qiskit.compile([qc1, qc2], my_backend)
     # I think we need to make a qobj into a class
 
     # Runing the job
@@ -71,7 +70,8 @@ try:
     #
     # job = my_backend.run(qobj)
     # sim_result=job.retrieve
-    # the job is a new object that runs when it does and i dont wait for it to finish and can get results later
+    # the job is a new object that runs when it does and i dont wait for it to
+    # finish and can get results later
     # other job methods
     # job.abort -- use to abort the job
     # job.status   -- the status of the job
@@ -82,65 +82,62 @@ try:
     print(sim_result.get_counts(qc2))
 
     # Compile and run the Quantum Program on a real device backend
-    if remote_backends:
-
+    try:
         # See a list of available remote backends
         print("\n(Remote Backends)")
-        for backend in remote_backends:
-            backend_status = qiskit.backends.status(backend)
-            print(backend, backend_status)
+        for backend_name in qiskit.available_backends({'local': False}):
+            backend = qiskit.get_backend(backend_name)
+            print(backend.status)
 
-        try:
-            # select least busy available device and execute
-            # this we should make a method to get the best backend
-            device_status = [qiskit.backends.status(backend)
-                             for backend in remote_backends if "simulator" not in backend]
-            best_device = min([x for x in device_status if x['available'] is True],
-                              key=lambda x:x['pending_jobs'])
+        # select least busy available device and execute.
+        best_device = lowest_pending_jobs(qiskit.available_backends({'local': False,
+                                                                     'simulator': False}))
+        print("Running on current least busy device: ", best_device)
 
-            my_backend  = qiskit.backends.get_backend_instance(best_device['backend'])
-            # my_backend = qiskit.backends.get_backend_instance(filter remote, device, smallest queue)
-            print("Running on current least busy device: ", best_device['backend'])
+        my_backend = qiskit.get_backend(best_device)
 
-            print("(with Configuration) ")
-            pprint.pprint(my_backend.configuration)
-            print("(with calibration) ")
-            pprint.pprint(my_backend.calibration)
-            print("(with parameters) ")
-            pprint.pprint(my_backend.parameters)
+        print("(with Configuration) ")
+        pprint.pprint(my_backend.configuration)
+        print("(with calibration) ")
+        pprint.pprint(my_backend.calibration)
+        print("(with parameters) ")
+        pprint.pprint(my_backend.parameters)
 
-            # Compiling the job
-            compile_config = {
-                'backend': best_device['backend'],
-                'shots': 1024,
-                'max_credits': 10
-                }
-            qobj = qiskit.compile([qc1,qc2],compile_config)
-            # I think we need to make a qobj into a class
+        # Compiling the job
+        compile_config = {
+            'shots': 1024,
+            'max_credits': 10
+            }
 
-            # Runing the job
-            q_job = qiskit.QuantumJob(qobj, preformatted=True, resources={
-                        'max_credits': qobj['config']['max_credits'], 'wait': 5,
-                        'timeout': 300})
-            exp_result = my_backend.run(q_job)
-            # ideally
-            #   1. we need to make the run take as the input a qobj
-            #   2. we need to make the run return a job object
-            #
-            # job = my_backend.run(qobj, run_config)
-            # sim_result=job.retrieve
-            # the job is a new object that runs when it does and i dont wait for it to finish and can get results later
-            # other job methods
-            # job.abort -- use to abort the job
-            # job.status   -- the status of the job
+        # I want to make it so the compile is only done once and the needing
+        # a backend is optional
+        qobj = qiskit.compile([qc1, qc2], my_backend, compile_config)
+        # I think we need to make a qobj into a class
 
-            # Show the results
-            print("experiment: ", exp_result)
-            print(exp_result.get_counts(qc1))
-            print(exp_result.get_counts(qc2))
+        # Runing the job
+        q_job = qiskit.QuantumJob(qobj, preformatted=True, resources={
+            'max_credits': qobj['config']['max_credits'], 'wait': 5, 'timeout': 300})
 
-        except:
-            print("All devices are currently unavailable.")
+        exp_result = my_backend.run(q_job)
+        # ideally
+        #   1. we need to make the run take as the input a qobj
+        #   2. we need to make the run return a job object
+        #
+        # job = my_backend.run(qobj, run_config)
+        # sim_result=job.retrieve
+        # the job is a new object that runs when it does and i dont wait for it
+        # to finish and can get results later
+        # other job methods
+        # job.abort -- use to abort the job
+        # job.status   -- the status of the job
+
+        # Show the results
+        print("experiment: ", exp_result)
+        print(exp_result.get_counts(qc1))
+        print(exp_result.get_counts(qc2))
+
+    except:
+        print("All devices are currently unavailable.")
 
 except qiskit.QISKitError as ex:
     print('There was an error in the circuit!. Error = {}'.format(ex))

@@ -17,6 +17,16 @@ except:
              Have you initialized a Qconfig.py file with your personal token?
              For now, there's only access to local simulator backends...""")
 
+
+def lowest_pending_jobs(list_of_backends):
+    """Returns the backend with lowest pending jobs."""
+    device_status = [qiskit.get_backend(backend).status for backend in list_of_backends]
+
+    best = min([x for x in device_status if x['available'] is True],
+               key=lambda x: x['pending_jobs'])
+    return best['backend']
+
+
 try:
     # Create a Quantum and Classical Register.
     qubit_reg = qiskit.QuantumRegister(2)
@@ -47,30 +57,21 @@ try:
 
     # see a list of available remote backends
     print("\n(Remote Backends)")
-    print(qiskit.available_backends({'local': False}))
+    print(qiskit.available_backends({'local': False, 'simulator': False}))
 
     # Compile and run the Quantum Program on a real device backend
     try:
-        # select least busy available device and execute. This should become a function
-        # this we should make a method to get the best backend
-        remote_backends=qiskit.available_backends({'local': False})
-        qiskit.available_backends({'local': False,})
-
-        device_status = [qiskit.get_backend(backend).status
-                            for backend in remote_backends if "simulator" not in backend]
-
-        best_device = min([x for x in device_status if x['available'] is True],
-                            key=lambda x: x['pending_jobs'])
-
-        my_backend = qiskit.get_backend(best_device['backend'])
-        print("Running on current least busy device: ", best_device['backend'])
+        # select least busy available device and execute.
+        best_device = lowest_pending_jobs(qiskit.available_backends({'local': False,
+                                                                     'simulator': False}))
+        print("Running on current least busy device: ", best_device)
 
         # running the job
         compile_config = {
             'shots': 1024,
             'max_credits': 10
             }
-        exp_result = qiskit.execute([qc1, qc2], backend=best_device['backend'],
+        exp_result = qiskit.execute([qc1, qc2], backend=best_device,
                                     compile_config=compile_config,
                                     wait=5, timeout=300)
 
