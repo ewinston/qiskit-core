@@ -75,6 +75,7 @@ CompositeGate.uzz = uzz
 
 # TODO: add a body for this gate?
 # Uzz rotation by angle theta
+"""
 QuantumCircuit.definitions["uzz"] = {
     "print": True,
     "opaque": False,
@@ -85,3 +86,4 @@ QuantumCircuit.definitions["uzz"] = {
     # gate uzz(theta) a, b { }
     "body": node.GateBody([])
 }
+"""

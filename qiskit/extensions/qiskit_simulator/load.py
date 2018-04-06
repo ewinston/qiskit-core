@@ -67,6 +67,7 @@ CompositeGate.load = load
 
 
 # command to load a saved state (identity)
+"""
 QuantumCircuit.definitions["load"] = {
     "print": True,
     "opaque": False,
@@ -77,3 +78,4 @@ QuantumCircuit.definitions["load"] = {
     # gate load(m) a { }
     "body": node.GateBody([])
 }
+"""

@@ -68,6 +68,7 @@ CompositeGate.save = save
 
 
 # cache quantum state (identity)
+"""
 QuantumCircuit.definitions["save"] = {
     "print": True,
     "opaque": False,
@@ -78,3 +79,4 @@ QuantumCircuit.definitions["save"] = {
     # gate save(m) a { }
     "body": node.GateBody([])
 }
+"""

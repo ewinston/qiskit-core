@@ -68,6 +68,7 @@ CompositeGate.noise = noise
 
 
 # switch noise off (0) or on (1) (identity)
+"""
 QuantumCircuit.definitions["noise"] = {
     "print": True,
     "opaque": False,
@@ -78,3 +79,4 @@ QuantumCircuit.definitions["noise"] = {
     # gate noise(m) a { }
     "body": node.GateBody([])
 }
+"""
