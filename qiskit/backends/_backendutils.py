@@ -91,6 +91,7 @@ def discover_local_backends(directory=os.path.dirname(__file__)):
                             'backend %s could not be initialized', fullname)
     return backend_name_list
 
+
 def discover_backend_classes(package, configuration=None):
     """This function attempts to discover all backend modules.
 
@@ -99,33 +100,33 @@ def discover_backend_classes(package, configuration=None):
     """
     backend_name_list = []
     for _, name, _ in pkgutil.walk_packages(package.__file__):
-            fullname = package.__name__ + '.' + name
-            modspec = importlib.util.find_spec(fullname)
-            try:
-                mod = importlib.util.module_from_spec(modspec)
-                modspec.loader.exec_module(mod)
-            except Exception as err:
-                logger.info('error checking for backend in {}'.format(
-                    fullname))
-                continue
-            for _, cls in inspect.getmembers(mod, inspect.isclass):
-                if 'qiskit.backends' in fullname:
-                    print(cls)
-                # Iterate through the classes defined on the module.
-                if (issubclass(cls, BaseBackend) and
-                        cls.__module__ == modspec.name):
-                    try:
-                        backend_name = register_backend(cls, configuration=configuration)
-                        if backend_name is not None:
-                            importlib.import_module(fullname)
-                            backend_name_list.extend(backend_name if isinstance(
-                                backend_name, list) else [backend_name])
-                    except QISKitError:
-                        # Ignore backends that could not be initialized.
-                        logger.info(
-                            'backend %s could not be initialized', fullname)
+        fullname = package.__name__ + '.' + name
+        modspec = importlib.util.find_spec(fullname)
+        try:
+            mod = importlib.util.module_from_spec(modspec)
+            modspec.loader.exec_module(mod)
+        except Exception as err:
+            logger.info('error checking for backend in {}'.format(
+                fullname))
+            continue
+        for _, cls in inspect.getmembers(mod, inspect.isclass):
+            if 'qiskit.backends' in fullname:
+                print(cls)
+            # Iterate through the classes defined on the module.
+            if (issubclass(cls, BaseBackend) and
+                    cls.__module__ == modspec.name):
+                try:
+                    backend_name = register_backend(cls, configuration=configuration)
+                    if backend_name is not None:
+                        importlib.import_module(fullname)
+                        backend_name_list.extend(backend_name if isinstance(
+                            backend_name, list) else [backend_name])
+                except QISKitError:
+                    # Ignore backends that could not be initialized.
+                    logger.info(
+                        'backend %s could not be initialized', fullname)
     return backend_name_list
-        
+
 
 def discover_remote_backends(api_):
     """Discover backends available from IBM Q
@@ -419,8 +420,10 @@ def remote_backends():
     return [backend.name for backend in _REGISTERED_BACKENDS.values()
             if backend.configuration.get('local') is False]
 
+
 def available_backends():
     """Get all available backend names."""
     return [backend.name for backend in _REGISTERED_BACKENDS.values()]
+
 
 discover_local_backends()

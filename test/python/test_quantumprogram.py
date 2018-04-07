@@ -30,7 +30,6 @@ from IBMQuantumExperience import RegisterSizeError
 from qiskit import (ClassicalRegister, QISKitError, QuantumCircuit,
                     QuantumRegister, QuantumProgram, Result)
 from qiskit.tools import file_io
-#import qiskit.backends
 from .common import requires_qe_access, QiskitTestCase, Path
 
 
@@ -1421,7 +1420,7 @@ class TestQuantumProgram(QiskitTestCase):
         qc2.measure(qr[0], cr[0])
         qc2.measure(qr[1], cr[1])
         circuits = ['qc1', 'qc2']
-        shots = 1024  # the number of shots in the experiment.        
+        shots = 1024  # the number of shots in the experiment.
         q_program.set_api(QE_TOKEN, QE_URL)
         backend = 'ibmqx_qasm_simulator'
         result = q_program.execute(circuits, backend=backend, shots=shots,

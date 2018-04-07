@@ -26,8 +26,6 @@ import copy
 from collections import namedtuple
 from types import ModuleType
 
-#import qiskit
-#import qiskit.backends
 from .backends import BaseBackend
 from ._qiskiterror import QISKitError
 
@@ -70,7 +68,7 @@ def register(token, url='https://quantumexperience.ng.bluemix.net/api',
         package (ModuleType): the package to register backends from. This
              package will be checked for classes which inherit from BaseBackend.
     Returns:
-        : list of names of the backends successfully registered
+        list: list of names of the backends successfully registered
     """
     config = {
         'url': url,
@@ -94,7 +92,7 @@ def discover_backend_classes(package, configuration=None):
         package (module): module to search for classes derived from BaseBackend
 
     Returns:
-        : list of backend names successfully registered
+        list: list of backend names successfully registered
     Raises:
         TypeError: package is not a module
     """
@@ -128,6 +126,7 @@ def discover_backend_classes(package, configuration=None):
                     logger.info(
                         'backend %s could not be initialized', name)
     return backend_name_list
+
 
 def register_backend(cls, configuration=None):
     """Register a backend in the list of available backends.
@@ -199,6 +198,7 @@ def register_backend(cls, configuration=None):
     else:
         raise QISKitError('Could not register backend for this class')
 
+
 def local_backends():
     """Get the local backends."""
     return available_backends({'local': True})
@@ -208,25 +208,26 @@ def remote_backends():
     """Get the remote backends."""
     return available_backends({'local': False})
 
+
 def available_backends(conf_dict=None):
     """Get all available backend names."""
-    list_of_backends = [backend.name for backend in _REGISTERED_BACKENDS.values()]    
+    list_of_backends = [backend.name for backend in _REGISTERED_BACKENDS.values()]
     if conf_dict:
         if "local" in conf_dict:
             list_of_backends_temp = copy.deepcopy(list_of_backends)
             for backend_name in list_of_backends_temp:
                 backend = get_backend(backend_name)
                 if conf_dict['local']:
-                    if not backend.configuration['local']:                        
+                    if not backend.configuration['local']:
                         list_of_backends.remove(backend_name)
                 else:
                     if backend.configuration['local']:
                         list_of_backends.remove(backend_name)
-                
+
         if "simulator" in conf_dict:
             list_of_backends_temp = copy.deepcopy(list_of_backends)
             for backend_name in list_of_backends_temp:
-                backend = get_backend(backend_name)  
+                backend = get_backend(backend_name)
                 if conf_dict['simulator']:
                     if not backend.configuration['simulator']:
                         list_of_backends.remove(backend_name)

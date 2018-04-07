@@ -22,8 +22,6 @@ import logging
 import pprint
 from threading import Lock
 
-#import qiskit.backends as backends
-#from .backends import (local_backends, remote_backends)
 from ._backend_manager import (get_backend, local_backends, remote_backends)
 from ._result import Result
 

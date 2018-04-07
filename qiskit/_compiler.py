@@ -87,10 +87,12 @@ def execute(list_of_circuits, backend, compile_config=None,
 def compile(list_of_circuits, backend, compile_config=None):
     """Compile a list of circuits into a qobj.
 
-    XXX THIS FUNCTION WILL BE REWRITTEN IN VERSION 0.6
+    FIXME THIS FUNCTION WILL BE REWRITTEN IN VERSION 0.6. It will be a thin wrapper
+    of circuit->dag, transpiler (dag -> dag) and dags-> qobj
 
     Args:
         list_of_circuits (list[QuantumCircuits]): list of circuits
+        backend (obj): a backend object to use as the default compiling option
         compile_config (dict or None): a dictionary of compile configurations.
             If `None`, the default compile configuration will be used.
 
@@ -148,7 +150,7 @@ def compile(list_of_circuits, backend, compile_config=None):
         hpc = None
 
     qobj['circuits'] = []
-    
+
     if not basis_gates:
         if 'basis_gates' in backend_conf:
             basis_gates = backend_conf['basis_gates']
@@ -177,7 +179,8 @@ def compile(list_of_circuits, backend, compile_config=None):
                 elif isinstance(instruction, Gate) and bool(set(instruction.arg) &
                                                             set(measured_qubits)):
                     raise QISKitError('backend "{0}" rejects gate after '
-                                      'measurement in circuit "{1}"'.format(backend_name, circuit.name))
+                                      'measurement in circuit "{1}"'.format(backend_name,
+                                                                            circuit.name))
             for i, qubit in zip(qasm_idx, measured_qubits):
                 circuit.data.insert(i, Barrier([qubit], circuit))
         dag_circuit, final_layout = compile_circuit(

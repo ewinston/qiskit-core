@@ -29,7 +29,8 @@ from qiskit import QuantumJob
 
 from ._random_circuit_generator import RandomCircuitGenerator
 from .common import requires_qe_access, QiskitTestCase
-qiskit.register(None,package=qiskit)
+qiskit.register(None, package=qiskit)
+
 
 def mock_run_local_backend(self):
     # pylint: disable=unused-argument
@@ -102,7 +103,7 @@ class TestJobProcessor(QiskitTestCase):
         self.job_processor_finished = False
 
     def _init_ibmqx(self, QE_TOKEN, QE_URL):
-        qiskit.register(QE_TOKEN,package=qiskit)
+        qiskit.register(QE_TOKEN, package=qiskit)
 
     def test_load_unroll_qasm_file(self):
         _ = load_unroll_qasm_file(self.qasm_filename)

@@ -127,7 +127,7 @@ class QasmSimulator(BaseBackend):
         """
         Args:
             configuration (dict): backend configuration
-            
+
         """
         self._configuration = {
             'name': 'local_qasm_simulator',
@@ -141,7 +141,7 @@ class QasmSimulator(BaseBackend):
         # if merge is True, fields passed in on configuration will replace
         # those defined above.
         super().__init__(configuration=configuration, merge=merge)
-        
+
         self._local_random = random.Random()
 
         # Define attributes in __init__.

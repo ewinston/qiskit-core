@@ -20,14 +20,14 @@
 
 import unittest
 
-#import qiskit.backends
 import qiskit
 import os
 import json
-import jsonschema 
+import jsonschema
 
 from .common import requires_qe_access, QiskitTestCase
 _schema_dir = os.path.dirname(qiskit.__file__) + '/schemas/backends'
+
 
 class TestBackends(QiskitTestCase):
     """QISKit Backends (Object) Tests."""
@@ -86,7 +86,7 @@ class TestBackends(QiskitTestCase):
         """
         qiskit.register(None, package=qiskit)
         local = qiskit.available_backends({'local': True})
-        backend= qiskit.get_backend(local[0])
+        backend = qiskit.get_backend(local[0])
         self.assertEqual(local[0], backend.configuration['name'])
 
     def test_local_backend_status(self):
@@ -123,7 +123,7 @@ class TestBackends(QiskitTestCase):
                 schema = json.load(schema_file)
             test = jsonschema.validate(status, schema)
             self.assertIsNone(test)
-        
+
     def test_local_backend_configuration(self):
         """Test backend configuration.
 
