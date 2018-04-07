@@ -74,13 +74,13 @@ def execute(list_of_circuits, backend, compile_config=None,
     """
     compile_config = compile_config or {}
     compile_config = {**COMPILE_CONFIG_DEFAULT, **compile_config}
-    my_backend = get_backend(backend)
-    qobj = compile(list_of_circuits, my_backend, compile_config)
+    backend_obj = get_backend(backend)
+    qobj = compile(list_of_circuits, backend_obj, compile_config)
 
     # XXX When qobj is done this should replace q_job
     q_job = QuantumJob(qobj, preformatted=True, resources={
         'max_credits': qobj['config']['max_credits'], 'wait': wait, 'timeout': timeout})
-    result = my_backend.run(q_job)
+    result = backend_obj.run(q_job)
     return result
 
 

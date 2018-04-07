@@ -30,7 +30,7 @@ from IBMQuantumExperience import RegisterSizeError
 from qiskit import (ClassicalRegister, QISKitError, QuantumCircuit,
                     QuantumRegister, QuantumProgram, Result)
 from qiskit.tools import file_io
-import qiskit.backends
+#import qiskit.backends
 from .common import requires_qe_access, QiskitTestCase, Path
 
 
@@ -581,8 +581,7 @@ class TestQuantumProgram(QiskitTestCase):
         If all correct some should exists (even if offline).
         """
         q_program = QuantumProgram(specs=self.QPS_SPECS)
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         available_backends = q_program.available_backends()
         # print(available_backends)
         self.assertTrue(available_backends)
@@ -594,8 +593,7 @@ class TestQuantumProgram(QiskitTestCase):
         If all correct some should exists.
         """
         q_program = QuantumProgram(specs=self.QPS_SPECS)
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         online_backends = q_program.online_backends()
         # print(online_backends)
         self.log.info(online_backends)
@@ -608,8 +606,7 @@ class TestQuantumProgram(QiskitTestCase):
         If all correct some should exists. NEED internet connection for this.
         """
         qp = QuantumProgram(specs=self.QPS_SPECS)
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        qp.set_api(QE_TOKEN, QE_URL)
         online_simulators = qp.online_simulators()
         # print(online_simulators)
         self.log.info(online_simulators)
@@ -622,8 +619,7 @@ class TestQuantumProgram(QiskitTestCase):
         If all correct some should exists. NEED internet connection for this.
         """
         qp = QuantumProgram(specs=self.QPS_SPECS)
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        qp.set_api(QE_TOKEN, QE_URL)
         online_devices = qp.online_devices()
         # print(online_devices)
         self.log.info(online_devices)
@@ -670,8 +666,8 @@ class TestQuantumProgram(QiskitTestCase):
         qp = QuantumProgram(specs=self.QPS_SPECS)
         config_keys = {'name', 'simulator', 'local', 'description',
                        'coupling_map', 'basis_gates'}
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        backend_list = qiskit.backends.discover_remote_backends(api)
+        qp.set_api(QE_TOKEN, QE_URL)
+        backend_list = qp.available_backends()
         if backend_list:
             backend = backend_list[0]
         backend_config = qp.get_backend_configuration(backend)
@@ -695,8 +691,8 @@ class TestQuantumProgram(QiskitTestCase):
         If all correct should return dictionary on length 4.
         """
         q_program = QuantumProgram(specs=self.QPS_SPECS)
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        backend_list = qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
+        backend_list = q_program.online_devices()
         if backend_list:
             backend = backend_list[0]
         result = q_program.get_backend_calibration(backend)
@@ -711,8 +707,8 @@ class TestQuantumProgram(QiskitTestCase):
         If all correct should return dictionary on length 4.
         """
         q_program = QuantumProgram(specs=self.QPS_SPECS)
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        backend_list = qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
+        backend_list = q_program.online_devices()
         if backend_list:
             backend = backend_list[0]
         result = q_program.get_backend_parameters(backend)
@@ -930,8 +926,7 @@ class TestQuantumProgram(QiskitTestCase):
         qc.x(qr[13])
         for j in range(16):
             qc.measure(qr[j], cr[j])
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         backend = 'ibmqx5'
         coupling_map = [[1, 0], [1, 2], [2, 3], [3, 4], [3, 14], [5, 4],
                         [6, 5], [6, 7], [6, 11], [7, 10], [8, 7], [9, 8],
@@ -1376,8 +1371,7 @@ class TestQuantumProgram(QiskitTestCase):
         qc.h(qr[0])
         qc.measure(qr[0], cr[0])
         shots = 1024  # the number of shots in the experiment.
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         backend = 'ibmqx_qasm_simulator'
         # print(backend)
         result = q_program.execute(['qc'], backend=backend,
@@ -1399,8 +1393,7 @@ class TestQuantumProgram(QiskitTestCase):
         qc.h(qr)
         qc.measure(qr, cr)
         shots = 1  # the number of shots in the experiment.
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         backend = 'ibmqx_qasm_simulator'
         with self.assertLogs('IBMQuantumExperience', level='WARNING') as cm:
             result = q_program.execute(['qc'], backend=backend, shots=shots, max_credits=3,
@@ -1428,9 +1421,8 @@ class TestQuantumProgram(QiskitTestCase):
         qc2.measure(qr[0], cr[0])
         qc2.measure(qr[1], cr[1])
         circuits = ['qc1', 'qc2']
-        shots = 1024  # the number of shots in the experiment.
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        shots = 1024  # the number of shots in the experiment.        
+        q_program.set_api(QE_TOKEN, QE_URL)
         backend = 'ibmqx_qasm_simulator'
         result = q_program.execute(circuits, backend=backend, shots=shots,
                                    max_credits=3, seed=1287126141)
@@ -1452,12 +1444,10 @@ class TestQuantumProgram(QiskitTestCase):
         qc = q_program.create_circuit("circuitName", [qr], [cr])
         qc.h(qr)
         qc.measure(qr[0], cr[0])
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         backend = 'ibmqx_qasm_simulator'
         shots = 1  # the number of shots in the experiment.
-        my_backend = qiskit.backends.get_backend_instance(backend)
-        status = my_backend.status
+        status = q_program.get_backend_status(backend)
         if not status.get('available', False):
             pass
         else:
@@ -1526,8 +1516,7 @@ class TestQuantumProgram(QiskitTestCase):
         qc2.measure(q2[1], c2[1])
         circuits = ['qc1', 'qc2']
         shots = 1024  # the number of shots in the experiment.
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         backend = 'ibmqx_qasm_simulator'
         result = q_program.execute(circuits, backend=backend, shots=shots,
                                    seed=8458)
@@ -1920,8 +1909,7 @@ class TestQuantumProgram(QiskitTestCase):
         circuits = ['qc2']
         shots = 1  # the number of shots in the experiment.
         backend = 'ibmqx_hpc_qasm_simulator'
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         qobj = q_program.compile(circuits, backend=backend, shots=shots,
                                  seed=88,
                                  hpc={'multi_shot_optimization': True,
@@ -1945,8 +1933,7 @@ class TestQuantumProgram(QiskitTestCase):
         circuits = ['qc2']
         shots = 1  # the number of shots in the experiment.
         backend = 'ibmqx_hpc_qasm_simulator'
-        api = IBMQuantumExperience(QE_TOKEN, {'url': QE_URL})
-        qiskit.backends.discover_remote_backends(api)
+        q_program.set_api(QE_TOKEN, QE_URL)
         self.assertRaises(QISKitError, q_program.compile, circuits,
                           backend=backend, shots=shots, seed=88,
                           hpc={'invalid_key': None})
