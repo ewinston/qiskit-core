@@ -127,6 +127,8 @@ class QasmSimulator(BaseBackend):
         """
         Args:
             configuration (dict): backend configuration
+            merge (bool): If merge is true, fields in configuration will
+                replace default
 
         """
         self._configuration = {

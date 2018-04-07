@@ -109,8 +109,7 @@ def discover_backend_classes(package, configuration=None):
             mod = importlib.util.module_from_spec(modspec)
             modspec.loader.exec_module(mod)
         except Exception as err:
-            logger.info('error checking for backend in {}'.format(
-                name))
+            logger.info('error checking for backend in {}'.format(name))
             continue
         for _, cls in inspect.getmembers(mod, inspect.isclass):
             # Iterate through the classes defined on the module.

@@ -30,13 +30,12 @@ import warnings
 
 # use the external IBMQuantumExperience Library
 import itertools
-import qiskit as qk
-
 from IBMQuantumExperience import IBMQuantumExperience
+import qiskit as qk
 
 # Local Simulator Modules
 from ._backend_manager import local_backends, remote_backends, get_backend, register
-from ._compiler import compile
+from ._compiler import compile # pylint: disable=redefined-builtin
 
 
 # Stable Modules
@@ -242,12 +241,12 @@ class QuantumProgram(object):
         Returns:
             list(QuantumRegister): Array of quantum registers objects
         """
-        new_registers = []
-        for register in register_array:
-            register = self.create_quantum_register(
-                register.get('name'), register["size"])
-            new_registers.append(register)
-        return new_registers
+        new_reg = []
+        for reg in register_array:
+            reg = self.create_quantum_register(
+                reg.get('name'), reg["size"])
+            new_reg.append(reg)
+        return new_reg
 
     def destroy_quantum_registers(self, register_array):
         """Destroy a set of Quantum Registers based on a array of them.
@@ -260,8 +259,8 @@ class QuantumProgram(object):
                     ]
                 Any other key in the dictionary will be ignored.
         """
-        for register in register_array:
-            self.destroy_quantum_register(register["name"])
+        for reg in register_array:
+            self.destroy_quantum_register(reg["name"])
 
     def create_classical_register(self, name=None, size=1):
         """Create a new Classical Register.
@@ -306,11 +305,11 @@ class QuantumProgram(object):
         Returns:
             list(ClassicalRegister): Array of classical registers objects
         """
-        new_registers = []
-        for register in registers_array:
-            new_registers.append(self.create_classical_register(
-                register.get("name"), register["size"]))
-        return new_registers
+        new_reg = []
+        for reg in registers_array:
+            new_reg.append(self.create_classical_register(
+                reg.get("name"), reg["size"]))
+        return new_reg
 
     def destroy_classical_register(self, name):
         """Destroy an existing Classical Register.
@@ -338,8 +337,8 @@ class QuantumProgram(object):
                     ]
                 Any other key in the dictionary will be ignored.
         """
-        for register in registers_array:
-            self.destroy_classical_register(register["name"])
+        for reg in registers_array:
+            self.destroy_classical_register(reg["name"])
 
     def create_circuit(self, name=None, qregisters=None, cregisters=None):
         """Create a empty Quantum Circuit in the Quantum Program.
@@ -365,10 +364,10 @@ class QuantumProgram(object):
         quantum_circuit = QuantumCircuit(name=name)
         if not self.__init_circuit:
             self.__init_circuit = quantum_circuit
-        for register in qregisters:
-            quantum_circuit.add(register)
-        for register in cregisters:
-            quantum_circuit.add(register)
+        for reg in qregisters:
+            quantum_circuit.add(reg)
+        for reg in cregisters:
+            quantum_circuit.add(reg)
         self.add_circuit(name, quantum_circuit)
         return self.__quantum_program[name]
 

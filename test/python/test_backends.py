@@ -20,10 +20,11 @@
 
 import unittest
 
-import qiskit
 import os
 import json
 import jsonschema
+import qiskit
+
 
 from .common import requires_qe_access, QiskitTestCase
 _schema_dir = os.path.dirname(qiskit.__file__) + '/schemas/backends'
@@ -49,7 +50,7 @@ class TestBackends(QiskitTestCase):
 
         If all correct some should exists.
         """
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
         remote = qiskit.available_backends({'local': False})
         # print(remote)
         self.log.info(remote)
@@ -61,7 +62,7 @@ class TestBackends(QiskitTestCase):
 
         If all correct some should exists.
         """
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
         remote = qiskit.available_backends({'local': False, 'simulator': False})
         # print(remote)
         self.log.info(remote)
@@ -73,7 +74,7 @@ class TestBackends(QiskitTestCase):
 
         If all correct some should exists.
         """
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
         remote = qiskit.available_backends({'local': False, 'simulator': True})
         # print(remote)
         self.log.info(remote)
@@ -102,9 +103,7 @@ class TestBackends(QiskitTestCase):
             schema_path = os.path.join(_schema_dir, 'backend_status_schema_py.json')
             with open(schema_path, 'r') as schema_file:
                 schema = json.load(schema_file)
-            test = jsonschema.validate(status, schema)
-            # print(status)
-            self.assertIsNone(test)
+            jsonschema.validate(status, schema)
 
     @requires_qe_access
     def test_remote_backend_status(self, QE_TOKEN, QE_URL):
@@ -112,7 +111,7 @@ class TestBackends(QiskitTestCase):
 
         If all correct should pass the validation.
         """
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
         remote = qiskit.available_backends({'local': False})
         for backend in remote:
             my_backend = qiskit.get_backend(backend)
@@ -121,8 +120,7 @@ class TestBackends(QiskitTestCase):
             schema_path = os.path.join(_schema_dir, 'backend_status_schema_py.json')
             with open(schema_path, 'r') as schema_file:
                 schema = json.load(schema_file)
-            test = jsonschema.validate(status, schema)
-            self.assertIsNone(test)
+            jsonschema.validate(status, schema)
 
     def test_local_backend_configuration(self):
         """Test backend configuration.
@@ -138,8 +136,7 @@ class TestBackends(QiskitTestCase):
             schema_path = os.path.join(_schema_dir, 'backend_configuration_schema_old_py.json')
             with open(schema_path, 'r') as schema_file:
                 schema = json.load(schema_file)
-            test = jsonschema.validate(configuration, schema)
-            self.assertIsNone(test)
+            jsonschema.validate(configuration, schema)
 
     @requires_qe_access
     def test_remote_backend_configuration(self, QE_TOKEN, QE_URL):
@@ -147,7 +144,7 @@ class TestBackends(QiskitTestCase):
 
         If all correct should pass the validation.
         """
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
         remote = qiskit.available_backends({'local': False})
         for backend in remote:
             my_backend = qiskit.get_backend(backend)
@@ -156,8 +153,7 @@ class TestBackends(QiskitTestCase):
             schema_path = os.path.join(_schema_dir, 'backend_configuration_schema_old_py.json')
             with open(schema_path, 'r') as schema_file:
                 schema = json.load(schema_file)
-            test = jsonschema.validate(configuration, schema)
-            self.assertIsNone(test)
+            jsonschema.validate(configuration, schema)
 
     def test_local_backend_calibration(self):
         """Test backend calibration.
@@ -180,7 +176,7 @@ class TestBackends(QiskitTestCase):
 
         If all correct should pass the validation.
         """
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
         remote = qiskit.available_backends({'local': False})
         for backend in remote:
             my_backend = qiskit.get_backend(backend)
@@ -215,7 +211,7 @@ class TestBackends(QiskitTestCase):
 
         If all correct should pass the validation.
         """
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
         remote = qiskit.available_backends({'local': False})
         for backend in remote:
             my_backend = qiskit.get_backend(backend)

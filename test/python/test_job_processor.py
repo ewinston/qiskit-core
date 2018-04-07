@@ -103,7 +103,7 @@ class TestJobProcessor(QiskitTestCase):
         self.job_processor_finished = False
 
     def _init_ibmqx(self, QE_TOKEN, QE_URL):
-        qiskit.register(QE_TOKEN, package=qiskit)
+        qiskit.register(QE_TOKEN, QE_URL, package=qiskit)
 
     def test_load_unroll_qasm_file(self):
         _ = load_unroll_qasm_file(self.qasm_filename)

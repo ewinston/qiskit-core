@@ -22,12 +22,13 @@ import time
 import logging
 import pprint
 import re
+from IBMQuantumExperience import IBMQuantumExperience
+
 from qiskit.backends._basebackend import BaseBackend
 from qiskit._compiler import compile_circuit
 from qiskit import QISKitError
 from qiskit._result import Result
 from qiskit._resulterror import ResultError
-from IBMQuantumExperience import IBMQuantumExperience
 
 logger = logging.getLogger(__name__)
 
