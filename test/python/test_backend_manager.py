@@ -30,7 +30,7 @@ from .common import requires_qe_access, QiskitTestCase
 _schema_dir = os.path.dirname(qiskit.__file__) + '/schemas/backends'
 
 
-class TestBackends(QiskitTestCase):
+class TestBackendManager(QiskitTestCase):
     """QISKit Backends (Object) Tests."""
 
     def test_local_backends_exist(self):
