@@ -56,11 +56,11 @@ class IbmQ(BaseBackend):
             for key, vals in self._configuration.items():
                 new_key = _snake_case_to_camel_case(key)
                 configuration_edit[new_key] = vals
-            #  XXX This is a hack as the hpc simulator is not correct in api
+            #  FIXME: This is a hack as the hpc simulator is not correct in api
             if configuration_edit['name'] == 'ibmqx_hpc_qasm_simulator':
                 configuration_edit['simulator'] = True
             self._configuration = configuration_edit
-            # XXX This is a hack to make sure that the local : False is added to the online device
+            # FIXME: This is a hack to make sure that the local : False is added to the online device
             self._configuration['local'] = False
 
     @classmethod

@@ -33,7 +33,10 @@ import itertools
 from IBMQuantumExperience import IBMQuantumExperience
 
 # Local Simulator Modules
-import qiskit.backends
+#import qiskit.backends
+from ._backend_manager import local_backends, remote_backends, get_backend, register
+from ._compiler import compile
+import qiskit as qk
 
 # Stable Modules
 from ._quantumregister import QuantumRegister
@@ -107,6 +110,7 @@ class QuantumProgram(object):
         self.__counter = itertools.count()
         if specs:
             self.__init_specs(specs)
+        register(None, package=qk)
 
     def enable_logs(self, level=logging.INFO):
         """Enable the console output of the logging messages.
@@ -714,6 +718,8 @@ class QuantumProgram(object):
                                   .format(ex)) from root_exception
         self.__api_config["token"] = token
         self.__api_config["config"] = config_dict.copy()
+        register(token, url, package=qk)
+        
 
     def set_api_hubs_config(self, hub, group, project):
         """Update the API hubs configuration, replacing the previous one.
@@ -778,10 +784,12 @@ class QuantumProgram(object):
             "qiskit.backends.remote_backends() instead is recommended.",
             DeprecationWarning)
 
-        local = qiskit.backends.local_backends()
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
-        remote = qiskit.backends.remote_backends()
+        local = local_backends()
+        #local = qiskit.backends.local_backends()
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)
+        #remote = qiskit.backends.remote_backends()
+        remote = remote_backends()
         return local + remote
 
     def online_backends(self):
@@ -805,9 +813,10 @@ class QuantumProgram(object):
             "Using qiskit.backends.remote_backends() object instead is recommended.",
             DeprecationWarning)
 
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
-        return qiskit.backends.remote_backends()
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)
+        #return qiskit.backends.remote_backends()
+        return remote_backends()
 
     def online_simulators(self):
         """Gets online simulators via QX API calls.
@@ -828,12 +837,15 @@ class QuantumProgram(object):
             DeprecationWarning)
 
         online_simulators_list = []
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
-        online_backends = qiskit.backends.remote_backends()
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)
+        #online_backends = qiskit.backends.remote_backends()
+        online_backends = remote_backends()
 
         for backend in online_backends:
-            config = qiskit.backends.configuration(backend)
+            backend_obj = get_backend(backend)
+            config = backend_obj.configuration
+            #config = qiskit.backends.configuration(backend)
             if config['simulator']:
                 online_simulators_list.append(backend)
         return online_simulators_list
@@ -857,12 +869,15 @@ class QuantumProgram(object):
             DeprecationWarning)
 
         online_device_list = []
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
-        online_backends = qiskit.backends.remote_backends()
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)
+        #online_backends = qiskit.backends.remote_backends()
+        online_backends = remote_backends()
 
         for backend in online_backends:
-            config = qiskit.backends.configuration(backend)
+            backend_obj = get_backend(backend)
+            config = backend_obj.configuration
+            #config = qiskit.backends.configuration(backend)
             if not config['simulator']:
                 online_device_list.append(backend)
         return online_device_list
@@ -892,9 +907,10 @@ class QuantumProgram(object):
             "Using qiskit.backends.get_backend_instance('name').status "
             "instead is recommended.", DeprecationWarning)
 
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
-        my_backend = qiskit.backends.get_backend_instance(backend)
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)
+        #my_backend = qiskit.backends.get_backend_instance(backend)
+        my_backend = get_backend(backend)
         return my_backend.status
 
     def get_backend_configuration(self, backend):
@@ -922,9 +938,11 @@ class QuantumProgram(object):
             "Using qiskit.backends.get_backend_instance('name').configuration "
             "instead is recommended.", DeprecationWarning)
 
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
-        return qiskit.backends.configuration(backend)
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)
+        my_backend = get_backend(backend) 
+        #return qiskit.backends.configuration(backend)
+        return my_backend.configuration
 
     def get_backend_calibration(self, backend):
         """Return the online backend calibrations.
@@ -951,9 +969,10 @@ class QuantumProgram(object):
             "Using qiskit.backends.get_backend_instance('name').calibration "
             "instead is recommended.", DeprecationWarning)
 
-        my_backend = qiskit.backends.get_backend_instance(backend)
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
+        #my_backend = qiskit.backends.get_backend_instance(backend)
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)        
+        my_backend = get_backend(backend)        
         return my_backend.calibration
 
     def get_backend_parameters(self, backend):
@@ -981,9 +1000,10 @@ class QuantumProgram(object):
             "Using qiskit.backends.get_backend_instance('name').parameters"
             "instead is recommended.", DeprecationWarning)
 
-        my_backend = qiskit.backends.get_backend_instance(backend)
-        if self.__api:
-            qiskit.backends.discover_remote_backends(self.__api)
+        #my_backend = qiskit.backends.get_backend_instance(backend)
+        #if self.__api:
+        #    qiskit.backends.discover_remote_backends(self.__api)
+        my_backend = get_backend(backend)        
         return my_backend.parameters
 
     ###############################################################
@@ -1027,7 +1047,8 @@ class QuantumProgram(object):
             'qobj_id': qobj_id,
             'hpc': hpc
         }
-        qobj = qiskit.compile(list_of_circuits, compile_config)
+        my_backend = get_backend(backend)
+        qobj = compile(list_of_circuits, my_backend, compile_config)
         return qobj
 
     def reconfig(self, qobj, backend=None, config=None, shots=None, max_credits=None, seed=None):
