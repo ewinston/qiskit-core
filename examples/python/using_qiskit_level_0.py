@@ -24,7 +24,7 @@ def lowest_pending_jobs(list_of_backends):
 
     best = min([x for x in device_status if x['available'] is True],
                key=lambda x: x['pending_jobs'])
-    return best['backend']
+    return best['name']
 
 
 try:

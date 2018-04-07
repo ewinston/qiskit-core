@@ -35,7 +35,7 @@ import qiskit as qk
 
 # Local Simulator Modules
 from ._backend_manager import local_backends, remote_backends, get_backend, register
-from ._compiler import compile # pylint: disable=redefined-builtin
+from ._compiler import compile  # pylint: disable=redefined-builtin
 
 
 # Stable Modules

@@ -16,7 +16,7 @@
 # limitations under the License.
 # =============================================================================
 
-"""Quantum Program QISKit Test."""
+"""Backend Manager Test."""
 
 import unittest
 
