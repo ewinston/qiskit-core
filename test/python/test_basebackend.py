@@ -20,11 +20,8 @@ import unittest
 import qiskit
 from qiskit import QISKitError
 from qiskit.backends import BaseBackend
-from qiskit._backend_manager import (register, register_backend,
-                                     local_backends, remote_backends,
-                                     available_backends, get_backend,
-                                     discover_backend_classes,
-                                     _REGISTERED_BACKENDS)
+from qiskit._backend_manager import (register_backend, local_backends, remote_backends,
+                                     discover_backend_classes, _REGISTERED_BACKENDS)
 from .common import QiskitTestCase
 
 
