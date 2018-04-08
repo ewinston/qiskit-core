@@ -148,15 +148,16 @@ def register_backend(cls, configuration=None):
         QISKitError: if `cls` is not a valid Backend.
     """
 
-    # Verify that the backend is not already registered.
-    if cls in [backend.cls for backend in _REGISTERED_BACKENDS.values()]:
-        raise QISKitError('Could not register backend: %s is not a subclass '
-                          'of BaseBackend' % cls)
-
     # Verify that it is a subclass of BaseBackend.
     if not issubclass(cls, BaseBackend):
         raise QISKitError('Could not register backend: %s is not a subclass '
                           'of BaseBackend' % cls)
+
+    
+    # Verify that the backend is not already registered.
+    if cls in [backend.cls for backend in _REGISTERED_BACKENDS.values()]:
+        raise QISKitError('Could not register backend: %s is already '
+                          'registered.' % cls)
 
     # check to see if class provides configurations.
     available_backends = getattr(cls, 'available_backends', None)
