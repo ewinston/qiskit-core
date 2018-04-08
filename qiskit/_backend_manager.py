@@ -102,7 +102,7 @@ def discover_backend_classes(package, configuration=None):
     backend_name_list = []
     for _, name, _ in pkgutil.walk_packages(package.__file__):
         # not sure why test directory is getting walked
-        if 'test.python' in name or 'setup' in name:
+        if 'test.python' in name or 'setup' in name or 'extensions' in name:
             continue
         modspec = importlib.util.find_spec(name)
         try:
