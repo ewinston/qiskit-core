@@ -649,7 +649,10 @@ class TestZeroIds(QiskitTestCase):
         backend = 'local_qasm_simulator'  # the backend to run on
         shots = 1024  # the number of shots in the experiment.
         result = q_program.execute(circuits, backend=backend, shots=shots, seed=78)
-        self.assertEqual(result.get_counts(1001), {'01': 519, '00': 505})
+        counts = result.get_counts(1001)
+        target = {'00': shots / 2, '01': shots / 2}
+        threshold = 0.025 * shots
+        self.assertDictAlmostEqual(counts, target, threshold)
 
 
 class TestIntegerIds(QiskitTestCase):
@@ -996,7 +999,10 @@ class TestIntegerIds(QiskitTestCase):
         shots = 1024  # the number of shots in the experiment.
         result = q_program.execute(circuits, backend=backend, shots=shots,
                                    seed=78)
-        self.assertEqual(result.get_counts(1001), {'01': 519, '00': 505})
+        counts = result.get_counts(1001)
+        target = {'00': shots / 2, '01': shots / 2}
+        threshold = 0.025 * shots
+        self.assertDictAlmostEqual(counts, target, threshold)
 
 
 class TestTupleIds(QiskitTestCase):
@@ -1338,7 +1344,10 @@ class TestTupleIds(QiskitTestCase):
         shots = 1024  # the number of shots in the experiment.
         result = q_program.execute(circuits, backend=backend, shots=shots,
                                    seed=78)
-        self.assertEqual(result.get_counts((1001.1, 1001j)), {'00': 505, '01': 519})
+        counts = result.get_counts((1001.1, 1001j))
+        target = {'00': shots / 2, '01': shots / 2}
+        threshold = 0.025 * shots
+        self.assertDictAlmostEqual(counts, target, threshold)
 
 
 if __name__ == '__main__':
