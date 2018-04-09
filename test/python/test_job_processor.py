@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =============================================================================
-'''
+
 import pprint
 import unittest
 import qiskit
@@ -338,4 +338,3 @@ class TestJobProcessor(QiskitTestCase):
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
-'''
