@@ -19,34 +19,28 @@
 Qasm Program Class
 """
 
-import random
+import itertools
 import json
 import logging
 import os
+import random
 import string
-import re
-from threading import Event
 import warnings
+from threading import Event
 
-import itertools
-
+import qiskit._compiler
 import qiskit.wizard
-from ._compiler import compile  # pylint: disable=redefined-builtin
 
-# Stable Modules
-from ._quantumregister import QuantumRegister
 from ._classicalregister import ClassicalRegister
-from ._quantumcircuit import QuantumCircuit
-from ._qiskiterror import QISKitError
-from ._logging import set_qiskit_logger, unset_qiskit_logger
-
-# Beta Modules
-from .unroll import CircuitBackend, Unroller
-from .qasm import Qasm
-from .mapper import coupling_dict2list
 from ._jobprocessor import JobProcessor
+from ._logging import set_qiskit_logger, unset_qiskit_logger
+from ._qiskiterror import QISKitError
+from ._quantumcircuit import QuantumCircuit
 from ._quantumjob import QuantumJob
-
+from ._quantumregister import QuantumRegister
+from .mapper import coupling_dict2list
+from .qasm import Qasm
+from .unroll import CircuitBackend, Unroller
 
 logger = logging.getLogger(__name__)
 
@@ -696,6 +690,7 @@ class QuantumProgram(object):
 
         # TODO: the setting of self._api and self.__api_config is left for
         # backwards-compatibility.
+        # pylint: disable=no-member
         self.__api = qiskit.wizard.DEFAULT_PROVIDER.providers[-1]._api
         config_dict = {
             'url': url,
@@ -996,7 +991,7 @@ class QuantumProgram(object):
             'hpc': hpc
         }
         my_backend = qiskit.wizard.get_backend(backend)
-        qobj = compile(list_of_circuits, my_backend, compile_config)
+        qobj = qiskit._compiler.compile(list_of_circuits, my_backend, compile_config)
         return qobj
 
     def reconfig(self, qobj, backend=None, config=None, shots=None, max_credits=None, seed=None):

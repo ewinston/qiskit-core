@@ -40,6 +40,7 @@ class IBMQProvider(BaseProvider):
         return IbmQ(configuration=self.backends[name], api=self._api)
 
     def available_backends(self, filters=None):
+        # pylint: disable=arguments-differ
         backends = self.backends
 
         # TODO: this is just an example filter.

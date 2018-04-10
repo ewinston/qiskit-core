@@ -30,8 +30,8 @@ def register(token, url,
     """
     Authenticate against an online provider.
 
-    Returns:
-        BaseProvider: the provider object.
+    Raises:
+        QISKitError: if the provider is not recognized.
     """
     if provider_name == 'qiskit':
         provider = IBMQProvider(token, url,
@@ -47,6 +47,8 @@ def available_backends(filters=None):
 
     Args:
         filters (dict): dictionary of filtering conditions.
+    Returns:
+        list: (of str): the names of the available backends.
     """
     return DEFAULT_PROVIDER.available_backends(filters)
 
@@ -64,8 +66,5 @@ def remote_backends():
 def get_backend(name):
     """
     Return a backend.
-
-    Returns:
-        BaseBackend: backend instance.
     """
     return DEFAULT_PROVIDER.get_backend(name)

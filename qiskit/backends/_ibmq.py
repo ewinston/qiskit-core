@@ -40,9 +40,10 @@ class IbmQ(BaseBackend):
         """Initialize remote backend for IBM Quantum Experience.
 
         Args:
-            configuration (dict): configuration of backend
+            configuration (dict): configuration of backend.
+            merge (bool): flag for merging the configuration.
             api (IBMQuantumExperience.IBMQuantumExperience.IBMQuantumExperience):
-                api for communicating with the Quantum Experience
+                api for communicating with the Quantum Experience.
         """
         super().__init__(configuration=configuration, merge=merge)
         self._api = api
