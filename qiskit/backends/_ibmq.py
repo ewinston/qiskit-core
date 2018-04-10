@@ -101,7 +101,10 @@ class IbmQ(BaseBackend):
             except (KeyError, TypeError):
                 hpc = None
 
-        output = self._api.run_job(api_jobs, qobj['config']['backend'],
+        # TODO: this should be self._configuration['name'] - need to check that
+        # it is always the case.
+        backend_name = qobj['config']['backend'].configuration['name']
+        output = self._api.run_job(api_jobs, backend_name,
                                    shots=qobj['config']['shots'],
                                    max_credits=qobj['config']['max_credits'],
                                    seed=seed0,

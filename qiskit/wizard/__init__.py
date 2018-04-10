@@ -25,14 +25,18 @@ DEFAULT_PROVIDER = DefaultQISKitProvider()
 
 
 def register(token, url,
-             hub=None, group=None, project=None, proxies=None,
+             hub=None, group=None, project=None, proxies=None, verify=True,
              provider_name='qiskit'):
     """
     Authenticate against an online provider.
+
+    Returns:
+        BaseProvider: the provider object.
     """
     if provider_name == 'qiskit':
-        DEFAULT_PROVIDER.add_provider(
-            IBMQProvider(token, url, hub, group, project, proxies))
+        provider = IBMQProvider(token, url,
+                                hub, group, project, proxies, verify)
+        DEFAULT_PROVIDER.add_provider(provider)
     else:
         raise QISKitError('provider name %s is not recognized' % provider_name)
 
