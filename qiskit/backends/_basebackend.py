@@ -61,7 +61,7 @@ class BaseBackend(ABC):
     @classmethod
     def available_backends(cls, configuration=None):
         """
-        Used to git a list of backend configurations for classes of the
+        Used to get a list of backend configurations for classes of the
         derived type.
         """
         return []

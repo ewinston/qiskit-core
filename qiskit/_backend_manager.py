@@ -108,8 +108,8 @@ def discover_backend_classes(package, configuration=None):
         try:
             mod = importlib.util.module_from_spec(modspec)
             modspec.loader.exec_module(mod)
-        except Exception as err:
-            logger.info('error checking for backend in {}'.format(name))
+        except (ImportError, ValueError, AttributeError):
+            logger.info('error checking for backend in %s', name)
             continue
         for _, cls in inspect.getmembers(mod, inspect.isclass):
             # Iterate through the classes defined on the module.
@@ -159,9 +159,10 @@ def register_backend(cls, configuration=None):
                           'registered.' % cls)
 
     # check to see if class provides configurations.
-    available_backends = getattr(cls, 'available_backends', None)
-    if callable(available_backends):
-        available_configurations = available_backends(configuration=configuration)
+    cls_available_backends = getattr(cls, 'available_backends', None)
+    if callable(cls_available_backends):
+        available_configurations = cls_available_backends(
+            configuration=configuration)
     else:
         available_configurations = [configuration]
     if available_configurations == []:
