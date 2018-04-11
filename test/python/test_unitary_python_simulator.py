@@ -98,8 +98,8 @@ class LocalUnitarySimulatorTest(QiskitTestCase):
         This test is similar to one in test_quantumprogram but doesn't use
         multiprocessing.
         """
-        qr = QuantumRegister('q', 2)
-        cr = ClassicalRegister('c', 1)
+        qr = QuantumRegister(2, 'q')
+        cr = ClassicalRegister(1, 'c')
         qc1 = QuantumCircuit(qr, cr)
         qc2 = QuantumCircuit(qr, cr)
         qc1.h(qr)
