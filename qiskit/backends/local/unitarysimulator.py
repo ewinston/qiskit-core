@@ -109,19 +109,19 @@ logger = logging.getLogger(__name__)
 class UnitarySimulator(BaseBackend):
     """Python implementation of a unitary simulator."""
 
+    DEFAULT_CONFIGURATION = {
+        'name': 'local_unitary_simulator',
+        'url': 'https://github.com/IBM/qiskit-sdk-py',
+        'simulator': True,
+        'local': True,
+        'description': 'A python simulator for unitary matrix',
+        'coupling_map': 'all-to-all',
+        'basis_gates': 'u1,u2,u3,cx,id'
+    }
+
     def __init__(self, configuration=None):
         """Initial the UnitarySimulator object."""
-        super().__init__(configuration)
-        if configuration is None:
-            self._configuration = {'name': 'local_unitary_simulator',
-                                   'url': 'https://github.com/IBM/qiskit-sdk-py',
-                                   'simulator': True,
-                                   'local': True,
-                                   'description': 'A python simulator for unitary matrix',
-                                   'coupling_map': 'all-to-all',
-                                   'basis_gates': 'u1,u2,u3,cx,id'}
-        else:
-            self._configuration = configuration
+        super().__init__(configuration or self.DEFAULT_CONFIGURATION.copy())
 
         # Define attributes inside __init__.
         self._unitary_state = None

@@ -126,24 +126,23 @@ class UGateGeneric(OneQubitGate):
 
 class SympyQasmSimulator(BaseBackend):
     """Python implementation of a qasm simulator."""
+    DEFAULT_CONFIGURATION = {
+        'name': 'local_sympy_qasm_simulator',
+        'url': 'https://github.com/QISKit/qiskit-sdk-py',
+        'simulator': True,
+        'local': True,
+        'description': 'A python sympy-based simulator for qasm files',
+        'coupling_map': 'all-to-all',
+        'basis_gates': 'u1,u2,u3,cx,id'
+    }
+
     def __init__(self, configuration=None):
         """
         Args:
             configuration (dict): backend configuration
         """
-        super().__init__(configuration)
-        if configuration is None:
-            self._configuration = {
-                'name': 'local_sympy_qasm_simulator',
-                'url': 'https://github.com/QISKit/qiskit-sdk-py',
-                'simulator': True,
-                'local': True,
-                'description': 'A python sympy-based simulator for qasm files',
-                'coupling_map': 'all-to-all',
-                'basis_gates': 'u1,u2,u3,cx,id'
-            }
-        else:
-            self._configuration = configuration
+        super().__init__(configuration or self.DEFAULT_CONFIGURATION.copy())
+
         self._classical_state = None
         self._number_of_qubits = None
         self._number_of_cbits = None

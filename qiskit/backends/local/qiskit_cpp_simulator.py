@@ -49,20 +49,18 @@ DEFAULT_SIMULATOR_PATHS = [
 class QISKitCppSimulator(BaseBackend):
     """C++ quantum circuit simulator with realistic noise"""
 
-    def __init__(self, configuration=None):
-        super().__init__(configuration)
-        self._configuration = configuration
+    DEFAULT_CONFIGURATION = {
+        'name': 'local_qiskit_simulator',
+        'url': 'https://github.com/QISKit/qiskit-sdk-py/src/cpp-simulator',
+        'simulator': True,
+        'local': True,
+        'description': 'A C++ realistic noise simulator for qobj files',
+        'coupling_map': 'all-to-all',
+        "basis_gates": 'u1,u2,u3,cx,id,x,y,z,h,s,sdg,t,tdg,wait,noise,save,load,uzz',
+    }
 
-        if not configuration:
-            self._configuration = {
-                'name': 'local_qiskit_simulator',
-                'url': 'https://github.com/QISKit/qiskit-sdk-py/src/cpp-simulator',
-                'simulator': True,
-                'local': True,
-                'description': 'A C++ realistic noise simulator for qobj files',
-                'coupling_map': 'all-to-all',
-                "basis_gates": 'u1,u2,u3,cx,id,x,y,z,h,s,sdg,t,tdg,wait,noise,save,load,uzz',
-            }
+    def __init__(self, configuration=None):
+        super().__init__(configuration or self.DEFAULT_CONFIGURATION.copy())
 
         # Try to use the default executable if not specified.
         if self._configuration.get('exe'):
@@ -87,21 +85,18 @@ class QISKitCppSimulator(BaseBackend):
 
 class CliffordCppSimulator(BaseBackend):
     """"C++ Clifford circuit simulator with realistic noise."""
+    DEFAULT_CONFIGURATION = {
+        'name': 'local_clifford_simulator',
+        'url': 'https://github.com/QISKit/qiskit-sdk-py/src/cpp-simulator',
+        'simulator': True,
+        'local': True,
+        'description': 'A C++ Clifford simulator with approximate noise',
+        'coupling_map': 'all-to-all',
+        'basis_gates': 'cx,id,x,y,z,h,s,sdg,wait,noise,save,load'
+    }
 
     def __init__(self, configuration=None):
-        super().__init__(configuration)
-        self._configuration = configuration
-
-        if not configuration:
-            self._configuration = {
-                'name': 'local_clifford_simulator',
-                'url': 'https://github.com/QISKit/qiskit-sdk-py/src/cpp-simulator',
-                'simulator': True,
-                'local': True,
-                'description': 'A C++ Clifford simulator with approximate noise',
-                'coupling_map': 'all-to-all',
-                'basis_gates': 'cx,id,x,y,z,h,s,sdg,wait,noise,save,load'
-            }
+        super().__init__(configuration or self.DEFAULT_CONFIGURATION.copy())
 
         # Try to use the default executable if not specified.
         if self._configuration.get('exe'):
