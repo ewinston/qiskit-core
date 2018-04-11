@@ -24,8 +24,8 @@ import unittest
 import jsonschema
 
 import qiskit.wizard
-from qiskit.backends.ibmq.ibmqprovider import IBMQProvider
-from qiskit.wizard.defaultqiskitprovider import DefaultQISKitProvider
+from qiskit.backends.ibmq import IBMQProvider
+from qiskit.wizard import DefaultQISKitProvider
 from .common import requires_qe_access, QiskitTestCase, Path
 
 

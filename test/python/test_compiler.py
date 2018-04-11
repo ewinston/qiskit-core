@@ -21,8 +21,8 @@
 import unittest
 import qiskit
 from qiskit import Result
-from qiskit.backends._qasmsimulator import QasmSimulator
-from qiskit.backends.ibmq.ibmqprovider import IBMQProvider
+from qiskit.backends.local import QasmSimulator
+from qiskit.backends.ibmq import IBMQProvider
 
 from .common import requires_qe_access, QiskitTestCase
 

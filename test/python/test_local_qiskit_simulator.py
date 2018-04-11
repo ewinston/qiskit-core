@@ -24,7 +24,7 @@ import numpy as np
 from numpy.linalg import norm
 
 import qiskit
-import qiskit.backends._qiskit_cpp_simulator as qiskitsimulator
+import qiskit.backends.local.qiskit_cpp_simulator as qiskitsimulator
 from qiskit import ClassicalRegister
 from qiskit import QuantumCircuit
 from qiskit import QuantumJob

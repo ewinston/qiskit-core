@@ -112,9 +112,9 @@ from collections import Counter
 import numpy as np
 
 from qiskit._result import Result
-from qiskit.backends._basebackend import BaseBackend
-from qiskit.backends._simulatorerror import SimulatorError
-from qiskit.backends._simulatortools import single_gate_matrix
+from qiskit.backends.basebackend import BaseBackend
+from qiskit.backends.local._simulatorerror import SimulatorError
+from qiskit.backends.local._simulatortools import single_gate_matrix
 
 
 # TODO add ["status"] = 'DONE', 'ERROR' especitally for empty circuit error

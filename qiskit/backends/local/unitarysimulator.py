@@ -96,7 +96,7 @@ import uuid
 import numpy as np
 
 from qiskit._result import Result
-from qiskit.backends._basebackend import BaseBackend
+from qiskit.backends.basebackend import BaseBackend
 from ._simulatortools import enlarge_single_opt, enlarge_two_opt, single_gate_matrix
 
 logger = logging.getLogger(__name__)

@@ -27,12 +27,12 @@ from qiskit._compiler import compile_circuit
 from qiskit._result import Result
 from qiskit._resulterror import ResultError
 from qiskit._util import _snake_case_to_camel_case
-from qiskit.backends._basebackend import BaseBackend
+from qiskit.backends import BaseBackend
 
 logger = logging.getLogger(__name__)
 
 
-class IbmQ(BaseBackend):
+class IBMQBackend(BaseBackend):
     """Backend class interfacing with the Quantum Experience remotely.
     """
 
