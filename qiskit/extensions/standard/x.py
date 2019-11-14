@@ -25,11 +25,24 @@ from qiskit.extensions.standard.u3 import U3Gate
 
 
 class XGate(Gate):
-    """Pauli X (bit-flip) gate."""
+    r"""Pauli X (bit-flip) gate.
 
-    def __init__(self, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{X}} =
+            \begin{bmatrix}
+                0 & 1 \\
+                1 & 0
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase_angle=0, label=None):
         """Create new X gate."""
-        super().__init__("x", 1, [], label=label)
+        super().__init__("x", 1, [], phase_angle=phase_angle, label=label)
 
     def _define(self):
         """
@@ -37,20 +50,16 @@ class XGate(Gate):
         u3(pi,0,pi) a;
         }
         """
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U3Gate(pi, 0, pi), [q[0]], [])
+        self.definition = [
+            (U3Gate(pi, 0, pi, phase_angle=self.phase_angle), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return XGate()  # self-inverse
+        return XGate(phase_angle=-self.phase_angle)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the X gate."""
         return numpy.array([[0, 1],
                             [1, 0]], dtype=complex)

@@ -34,20 +34,19 @@ from qiskit.extensions.standard.rxx import RXXGate
 class MSGate(Gate):
     """Global Molmer-Sorensen gate."""
 
-    def __init__(self, n_qubits, theta):
+    def __init__(self, n_qubits, theta, phase_angle=0, label=None):
         """Create new MS gate."""
-        super().__init__("ms", n_qubits, [theta])
+        super().__init__("ms", n_qubits, [theta],
+                         phase_angle=phase_angle, label=label)
 
     def _define(self):
-        definition = []
         q = QuantumRegister(self.num_qubits, "q")
-        rule = []
+        definition = []
         for i in range(self.num_qubits):
+            phase_angle = self.phase_angle if i == 0 else 0
             for j in range(i+1, self.num_qubits):
-                rule += [(RXXGate(self.params[0]), [q[i], q[j]], [])]
-
-        for inst in rule:
-            definition.append(inst)
+                definition += [(RXXGate(self.params[0],
+                                phase_angle=phase_angle), [q[i], q[j]], [])]
         self.definition = definition
 
 

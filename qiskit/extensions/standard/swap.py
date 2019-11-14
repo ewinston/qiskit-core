@@ -21,35 +21,53 @@ from qiskit.circuit import Gate
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit import QuantumRegister
 from qiskit.extensions.standard.cx import CnotGate
+from qiskit.extensions.standard.u1 import U1Gate
 
 
 class SwapGate(Gate):
-    """SWAP gate."""
+    r"""SWAP gate.
 
-    def __init__(self):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{SWAP}}
+            = \begin{bmatrix}
+                1 & 0 & 0 & 0 \\
+                0 & 0 & 1 & 0 \\
+                0 & 1 & 0 & 0 \\
+                0 & 0 & 0 & 1
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase_angle=0, label=None):
         """Create new SWAP gate."""
-        super().__init__("swap", 2, [])
+        super().__init__("swap", 2, [],
+                         phase_angle=phase_angle, label=label)
 
     def _define(self):
         """
         gate swap a,b { cx a,b; cx b,a; cx a,b; }
         """
-        definition = []
         q = QuantumRegister(2, "q")
-        rule = [
+        self.definition = [
             (CnotGate(), [q[0], q[1]], []),
             (CnotGate(), [q[1], q[0]], []),
             (CnotGate(), [q[0], q[1]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
+        # Temporary fix to add phase angle until we have added
+        # them to controlled gates like CNOT.
+        if self.phase_angle:
+            self.definition.append(
+                (U1Gate(0, phase_angle=self.phase_angle), [q[0]], []))
 
     def inverse(self):
         """Invert this gate."""
-        return SwapGate()  # self-inverse
+        return SwapGate(phase_angle=-self.phase_angle)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the Swap gate."""
         return numpy.array([[1, 0, 0, 0],
                             [0, 0, 1, 0],

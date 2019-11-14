@@ -24,28 +24,37 @@ from qiskit.extensions.standard.u3 import U3Gate
 
 
 class YGate(Gate):
-    """Pauli Y (bit-phase-flip) gate."""
+    r"""Pauli Y (bit-phase-flip) gate.
 
-    def __init__(self, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{Z}} =
+            \begin{bmatrix}
+                0 & -i \\
+                i & 0
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase_angle=0, label=None):
         """Create new Y gate."""
-        super().__init__("y", 1, [], label=label)
+        super().__init__("y", 1, [], phase_angle=phase_angle, label=label)
 
     def _define(self):
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U3Gate(pi, pi/2, pi/2), [q[0]], [])
+        self.definition = [
+            (U3Gate(pi, pi/2, pi/2, phase_angle=self.phase_angle), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return YGate()  # self-inverse
+        return YGate(phase_angle=-self.phase_angle)  # self-inverse
 
-    def to_matrix(self):
-        """Return a Numpy.array for the Y gate."""
+    def _matrix_definition(self):
+        """Return a Numpy.array for the Z gate."""
         return numpy.array([[0, -1j],
                             [1j, 0]], dtype=complex)
 

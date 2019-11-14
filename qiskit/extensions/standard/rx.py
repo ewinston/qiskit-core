@@ -24,33 +24,45 @@ from qiskit.extensions.standard.r import RGate
 
 
 class RXGate(Gate):
-    """rotation around the x-axis."""
+    r"""rotation around the x-axis.
 
-    def __init__(self, theta):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{RX}}(\theta)
+            = \exp\left(-i \frac{\theta}{2} \sigma_X \right)
+            = \begin{bmatrix}
+                \cos(\theta / 2) & -i \sin(\theta / 2) \\
+                -i \sin(\theta / 2) &  \cos(\theta / 2)
+            \end{bmatrix}
+    """
+
+    def __init__(self, theta, phase_angle=0, label=None):
         """Create new rx single qubit gate."""
-        super().__init__("rx", 1, [theta])
+        super().__init__("rx", 1, [theta],
+                         phase_angle=phase_angle, label=label)
 
     def _define(self):
         """
         gate rx(theta) a {r(theta, 0) a;}
         """
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (RGate(self.params[0], 0), [q[0]], [])
+        self.definition = [
+            (RGate(self.params[0], 0, phase_angle=self.phase_angle),
+             [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate.
 
         rx(theta)^dagger = rx(-theta)
         """
-        return RXGate(-self.params[0])
+        return RXGate(-self.params[0], phase_angle=-self.phase_angle)
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the RX gate."""
         cos = math.cos(self.params[0] / 2)
         sin = math.sin(self.params[0] / 2)

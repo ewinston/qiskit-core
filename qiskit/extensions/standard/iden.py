@@ -21,15 +21,27 @@ from qiskit.circuit import QuantumCircuit
 
 
 class IdGate(Gate):
-    """Identity gate.
+    r"""Identity gate.
 
     Identity gate corresponds to a single-qubit gate wait cycle,
     and should not be optimized or unrolled (it is an opaque gate).
+
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{I}} =
+            \begin{bmatrix}
+                1 & 0 \\
+                0 & 1
+            \end{bmatrix}
     """
 
-    def __init__(self, label=None):
+    def __init__(self, phase_angle=0, label=None):
         """Create new Identity gate."""
-        super().__init__("id", 1, [], label=label)
+        super().__init__("id", 1, [], phase_angle=phase_angle, label=label)
 
     def inverse(self):
         """Invert this gate."""

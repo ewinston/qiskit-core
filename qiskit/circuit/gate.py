@@ -14,6 +14,8 @@
 
 """Unitary gate."""
 
+import math
+import cmath
 import numpy as np
 from scipy.linalg import schur
 
@@ -24,18 +26,56 @@ from .instruction import Instruction
 class Gate(Instruction):
     """Unitary gate."""
 
-    def __init__(self, name, num_qubits, params, label=None):
+    def __init__(self, name, num_qubits, params, phase_angle=0, label=None):
         """Create a new gate.
 
         Args:
             name (str): the Qobj name of the gate
             num_qubits (int): the number of qubits the gate acts on.
             params (list): a list of parameters.
-            label (str or None): An optional label for the gate [Default: None]
+            phase_angle (float): set the exponent of the gate phase (Default: 0).
+            label (str or None): An optional label for the gate (Default: None).
         """
         self._label = label
         self.definition = None
+        self._phase_angle = 0
+        if phase_angle:
+            self.phase_angle = phase_angle
         super().__init__(name, num_qubits, 0, params)
+
+    @property
+    def phase(self):
+        """Return the phase of the gate."""
+        return cmath.exp(1j * self._phase_angle) if self._phase_angle else 1
+
+    @phase.setter
+    def phase(self, value):
+        """Set the phase of the gate."""
+        scale, angle = cmath.polar(value)
+        if scale != 1:
+            raise ValueError("Phase value must have absolute value of 1.")
+        self._phase_angle = angle
+
+    @property
+    def phase_angle(self):
+        """Return the phase angle of the gate."""
+        return self._phase_angle
+
+    @phase_angle.setter
+    def phase_angle(self, angle):
+        """Set the phase angle of the gate."""
+        # Set the angle to the [-2 * pi, 2 * pi] interval
+        if not angle:
+            self._phase_angle = 0
+        elif angle < 0:
+            self._phase_angle = angle % (-2 * math.pi)
+        else:
+            self._phase_angle = angle % (2 * math.pi)
+
+    def _matrix_definition(self):
+        """Return the Numpy.array matrix definition of the gate."""
+        # This should be set in classes that derive from Gate.
+        return None
 
     def to_matrix(self):
         """Return a Numpy.array for the gate unitary matrix.
@@ -44,7 +84,9 @@ class Gate(Instruction):
             CircuitError: If a Gate subclass does not implement this method an
                 exception will be raised when this base class method is called.
         """
-        raise CircuitError("to_matrix not defined for this {}".format(type(self)))
+        if self._matrix_definition() is None:
+            raise CircuitError("to_matrix not defined for this {}".format(type(self)))
+        return self.phase * self._matrix_definition()
 
     def power(self, exponent):
         """Creates a unitary gate as `gate^exponent`.

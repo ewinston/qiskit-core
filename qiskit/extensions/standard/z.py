@@ -24,28 +24,37 @@ from qiskit.extensions.standard.u1 import U1Gate
 
 
 class ZGate(Gate):
-    """Pauli Z (phase-flip) gate."""
+    r"""Pauli Z (phase-flip) gate.
 
-    def __init__(self, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{Z}} =
+            \begin{bmatrix}
+                1 & 0 \\
+                0 & -1
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase_angle=0, label=None):
         """Create new Z gate."""
-        super().__init__("z", 1, [], label=label)
+        super().__init__("z", 1, [], phase_angle=phase_angle, label=label)
 
     def _define(self):
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U1Gate(pi), [q[0]], [])
+        self.definition = [
+            (U1Gate(pi, phase_angle=self.phase_angle), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return ZGate()  # self-inverse
+        return ZGate(phase_angle=-self.phase_angle)  # self-inverse
 
-    def to_matrix(self):
-        """Return a Numpy.array for the X gate."""
+    def _matrix_definition(self):
+        """Return a Numpy.array for the Z gate."""
         return numpy.array([[1, 0],
                             [0, -1]], dtype=complex)
 

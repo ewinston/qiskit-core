@@ -25,28 +25,37 @@ from qiskit.extensions.standard.u2 import U2Gate
 
 
 class HGate(Gate):
-    """Hadamard gate."""
+    r"""Hadamard gate.
 
-    def __init__(self, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{H}} = \frac{1}{\sqrt{2}}
+            \begin{bmatrix}
+                1 & 1 \\
+                1 & -1
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase_angle=0, label=None):
         """Create new Hadamard gate."""
-        super().__init__("h", 1, [], label=label)
+        super().__init__("h", 1, [], phase_angle=phase_angle, label=label)
 
     def _define(self):
         """
         gate h a { u2(0,pi) a; }
         """
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U2Gate(0, pi), [q[0]], [])
+        self.definition = [
+            (U2Gate(0, pi, phase_angle=self.phase_angle), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return HGate()  # self-inverse
+        return HGate(phase_angle=-self.phase_angle)  # self-inverse
 
     def to_matrix(self):
         """Return a Numpy.array for the H gate."""

@@ -15,6 +15,7 @@
 """
 Rotation around the z-axis.
 """
+import numpy
 from qiskit.circuit import Gate
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit import QuantumRegister
@@ -22,31 +23,48 @@ from qiskit.extensions.standard.u1 import U1Gate
 
 
 class RZGate(Gate):
-    """rotation around the z-axis."""
+    r"""rotation around the z-axis.
 
-    def __init__(self, phi):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{RZ}}(\theta)
+            = \exp\left(-i \frac{\theta}{2} \sigma_Z \right)
+            = \begin{bmatrix}
+                e^{-i \theta/2} & 0 \\
+                0 & e^{-i \theta/2}
+            \end{bmatrix}
+    """
+
+    def __init__(self, phi, phase_angle=0, label=None):
         """Create new rz single qubit gate."""
-        super().__init__("rz", 1, [phi])
+        super().__init__("rz", 1, [phi],
+                         phase_angle=phase_angle, label=label)
 
     def _define(self):
         """
         gate rz(phi) a { u1(phi) a; }
         """
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U1Gate(self.params[0]), [q[0]], [])
+        self.definition = [
+            (U1Gate(self.params[0], phase_angle=self.phase_angle), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate.
 
         rz(phi)^dagger = rz(-phi)
         """
-        return RZGate(-self.params[0])
+        return RZGate(-self.params[0], phase_angle=-self.phase_angle)
+
+    def _matrix_definition(self):
+        """Return a Numpy.array for the RZ gate."""
+        return numpy.array([[numpy.exp(-1j * self.params[0] / 2), 0],
+                            [0, numpy.exp(1j * self.params[0] / 2)]],
+                           dtype=complex)
 
 
 def rz(self, phi, q):  # pylint: disable=invalid-name

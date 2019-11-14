@@ -23,27 +23,37 @@ from qiskit.extensions.standard.u3 import U3Gate
 
 
 class U1Gate(Gate):
-    """Diagonal single-qubit gate."""
+    r"""Diagonal single-qubit gate.
 
-    def __init__(self, theta, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_1(\lambda) = \begin{bmatrix}
+            1 & 0 \\
+            0 &  e^{i \lambda}
+            \end{bmatrix}
+    """
+
+    def __init__(self, theta, phase_angle=0, label=None):
         """Create new diagonal single-qubit gate."""
-        super().__init__("u1", 1, [theta], label=label)
+        super().__init__("u1", 1, [theta],
+                         phase_angle=phase_angle, label=label)
 
     def _define(self):
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U3Gate(0, 0, self.params[0]), [q[0]], [])
+        self.definition = [
+            (U3Gate(0, 0, self.params[0], phase_angle=self.phase_angle),
+             [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return U1Gate(-self.params[0])
+        return U1Gate(-self.params[0], phase_angle=-self.phase_angle)
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the U3 gate."""
         lam = self.params[0]
         lam = float(lam)

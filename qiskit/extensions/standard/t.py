@@ -24,60 +24,78 @@ from qiskit.extensions.standard.u1 import U1Gate
 
 
 class TGate(Gate):
-    """T Gate: pi/4 rotation around Z axis."""
+    r"""T Gate: pi/4 rotation around Z axis.
 
-    def __init__(self, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{T}} =
+            \begin{bmatrix}
+                1 & 0 \\
+                0 & e^{i \pi / 4}
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase_angle=0, label=None):
         """Create new T gate."""
-        super().__init__("t", 1, [], label=label)
+        super().__init__("t", 1, [], phase_angle=phase_angle, label=label)
 
     def _define(self):
         """
         gate t a { u1(pi/4) a; }
         """
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U1Gate(pi/4), [q[0]], [])
+        self.definition = [
+            (U1Gate(pi/4, phase_angle=self.phase_angle), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return TdgGate()
+        return TdgGate(phase_angle=-self.phase_angle)
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the S gate."""
         return numpy.array([[1, 0],
                             [0, (1+1j) / numpy.sqrt(2)]], dtype=complex)
 
 
 class TdgGate(Gate):
-    """T Gate: -pi/4 rotation around Z axis."""
+    r"""T Gate: -pi/4 rotation around Z axis
 
-    def __init__(self, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{T}^\dagger} =
+            \begin{bmatrix}
+                1 & 0 \\
+                0 & e^{-i \pi / 4}
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase_angle=0, label=None):
         """Create new Tdg gate."""
-        super().__init__("tdg", 1, [], label=label)
+        super().__init__("tdg", 1, [], phase_angle=phase_angle, label=label)
 
     def _define(self):
         """
         gate t a { u1(pi/4) a; }
         """
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U1Gate(-pi/4), [q[0]], [])
+        self.definition = [
+            (U1Gate(-pi/4, phase_angle=self.phase_angle), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return TGate()
+        return TGate(phase_angle=-self.phase_angle)
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the S gate."""
         return numpy.array([[1, 0],
                             [0, (1-1j) / numpy.sqrt(2)]], dtype=complex)
