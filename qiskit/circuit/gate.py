@@ -46,7 +46,7 @@ class Gate(Instruction):
     @property
     def phase(self):
         """Return the phase of the gate."""
-        return cmath.exp(1j * self._phase_angle) if self._phase_angle else 1
+        return cmath.exp(1j * self.phase_angle) if self.phase_angle else 1
 
     @phase.setter
     def phase(self, value):
@@ -54,7 +54,7 @@ class Gate(Instruction):
         scale, angle = cmath.polar(value)
         if scale != 1:
             raise ValueError("Phase value must have absolute value of 1.")
-        self._phase_angle = angle
+        self.phase_angle = angle
 
     @property
     def phase_angle(self):
@@ -126,6 +126,8 @@ class Gate(Instruction):
         instruction = super().assemble()
         if self.label:
             instruction.label = self.label
+        if self.phase_angle:
+            instruction.phase_angle = self.phase_angle
         return instruction
 
     @property
