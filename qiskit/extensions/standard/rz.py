@@ -35,14 +35,14 @@ class RZGate(Gate):
             = \exp\left(-i \frac{\theta}{2} \sigma_Z \right)
             = \begin{bmatrix}
                 e^{-i \theta/2} & 0 \\
-                0 & e^{-i \theta/2}
+                0 & e^{i \theta/2}
             \end{bmatrix}
     """
 
-    def __init__(self, phi, phase_angle=0, label=None):
+    def __init__(self, phi, phase=0, label=None):
         """Create new rz single qubit gate."""
         super().__init__("rz", 1, [phi],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         """
@@ -50,7 +50,7 @@ class RZGate(Gate):
         """
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U1Gate(self.params[0], phase_angle=self.phase_angle), [q[0]], [])
+            (U1Gate(self.params[0], phase=self.phase), [q[0]], [])
         ]
 
     def inverse(self):
@@ -58,7 +58,7 @@ class RZGate(Gate):
 
         rz(phi)^dagger = rz(-phi)
         """
-        return RZGate(-self.params[0], phase_angle=-self.phase_angle)
+        return RZGate(-self.params[0], phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the RZ gate."""

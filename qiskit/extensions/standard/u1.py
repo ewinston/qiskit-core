@@ -37,21 +37,21 @@ class U1Gate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, theta, phase_angle=0, label=None):
+    def __init__(self, theta, phase=0, label=None):
         """Create new diagonal single-qubit gate."""
         super().__init__("u1", 1, [theta],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U3Gate(0, 0, self.params[0], phase_angle=self.phase_angle),
+            (U3Gate(0, 0, self.params[0], phase=self.phase),
              [q[0]], [])
         ]
 
     def inverse(self):
         """Invert this gate."""
-        return U1Gate(-self.params[0], phase_angle=-self.phase_angle)
+        return U1Gate(-self.params[0], phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the U3 gate."""

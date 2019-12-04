@@ -41,10 +41,10 @@ class RYGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, theta, phase_angle=0, label=None):
+    def __init__(self, theta, phase=0, label=None):
         """Create new ry single qubit gate."""
         super().__init__("ry", 1, [theta],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         """
@@ -52,7 +52,7 @@ class RYGate(Gate):
         """
         q = QuantumRegister(1, "q")
         self.definition = [
-            (RGate(self.params[0], pi/2, phase_angle=self.phase_angle),
+            (RGate(self.params[0], pi/2, phase=self.phase),
              [q[0]], [])
         ]
 
@@ -61,7 +61,7 @@ class RYGate(Gate):
 
         ry(theta)^dagger = ry(-theta)
         """
-        return RYGate(-self.params[0], phase_angle=-self.phase_angle)
+        return RYGate(-self.params[0], phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the RY gate."""

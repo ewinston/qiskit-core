@@ -36,10 +36,10 @@ class U3Gate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, theta, phi, lam, phase_angle=0, label=None):
+    def __init__(self, theta, phi, lam, phase=0, label=None):
         """Create new two-pulse single qubit gate."""
         super().__init__("u3", 1, [theta, phi, lam],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def inverse(self):
         """Invert this gate.
@@ -47,7 +47,7 @@ class U3Gate(Gate):
         u3(theta, phi, lamb)^dagger = u3(-theta, -lam, -phi)
         """
         return U3Gate(-self.params[0], -self.params[2], -self.params[1],
-                      phase_angle=-self.phase_angle)
+                      phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the U3 gate."""

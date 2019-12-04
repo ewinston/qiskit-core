@@ -40,10 +40,10 @@ class RXGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, theta, phase_angle=0, label=None):
+    def __init__(self, theta, phase=0, label=None):
         """Create new rx single qubit gate."""
         super().__init__("rx", 1, [theta],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         """
@@ -51,7 +51,7 @@ class RXGate(Gate):
         """
         q = QuantumRegister(1, "q")
         self.definition = [
-            (RGate(self.params[0], 0, phase_angle=self.phase_angle),
+            (RGate(self.params[0], 0, phase=self.phase),
              [q[0]], [])
         ]
 
@@ -60,7 +60,7 @@ class RXGate(Gate):
 
         rx(theta)^dagger = rx(-theta)
         """
-        return RXGate(-self.params[0], phase_angle=-self.phase_angle)
+        return RXGate(-self.params[0], phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the RX gate."""

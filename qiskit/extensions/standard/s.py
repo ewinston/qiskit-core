@@ -39,9 +39,9 @@ class SGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, phase_angle=0, label=None):
+    def __init__(self, phase=0, label=None):
         """Create new S gate."""
-        super().__init__("s", 1, [], phase_angle=phase_angle, label=label)
+        super().__init__("s", 1, [], phase=phase, label=label)
 
     def _define(self):
         """
@@ -49,12 +49,12 @@ class SGate(Gate):
         """
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U1Gate(pi / 2, phase_angle=self.phase_angle), [q[0]], [])
+            (U1Gate(pi / 2, phase=self.phase), [q[0]], [])
         ]
 
     def inverse(self):
         """Invert this gate."""
-        return SdgGate(phase_angle=-self.phase_angle)
+        return SdgGate(phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the S gate."""
@@ -78,9 +78,9 @@ class SdgGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, phase_angle=0, label=None):
+    def __init__(self, phase=0, label=None):
         """Create new Sdg gate."""
-        super().__init__("sdg", 1, [], phase_angle=phase_angle, label=label)
+        super().__init__("sdg", 1, [], phase=phase, label=label)
 
     def _define(self):
         """
@@ -88,12 +88,12 @@ class SdgGate(Gate):
         """
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U1Gate(-pi / 2, phase_angle=self.phase_angle), [q[0]], [])
+            (U1Gate(-pi / 2, phase=self.phase), [q[0]], [])
         ]
 
     def inverse(self):
         """Invert this gate."""
-        return SGate(phase_angle=-self.phase_angle)
+        return SGate(phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the Sdg gate."""

@@ -40,9 +40,9 @@ class HGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, phase_angle=0, label=None):
+    def __init__(self, phase=0, label=None):
         """Create new Hadamard gate."""
-        super().__init__("h", 1, [], phase_angle=phase_angle, label=label)
+        super().__init__("h", 1, [], phase=phase, label=label)
 
     def _define(self):
         """
@@ -50,12 +50,12 @@ class HGate(Gate):
         """
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U2Gate(0, pi, phase_angle=self.phase_angle), [q[0]], [])
+            (U2Gate(0, pi, phase=self.phase), [q[0]], [])
         ]
 
     def inverse(self):
         """Invert this gate."""
-        return HGate(phase_angle=-self.phase_angle)  # self-inverse
+        return HGate(phase=-self.phase)  # self-inverse
 
     def to_matrix(self):
         """Return a Numpy.array for the H gate."""

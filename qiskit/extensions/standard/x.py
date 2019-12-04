@@ -40,9 +40,9 @@ class XGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, phase_angle=0, label=None):
+    def __init__(self, phase=0, label=None):
         """Create new X gate."""
-        super().__init__("x", 1, [], phase_angle=phase_angle, label=label)
+        super().__init__("x", 1, [], phase=phase, label=label)
 
     def _define(self):
         """
@@ -52,12 +52,12 @@ class XGate(Gate):
         """
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U3Gate(pi, 0, pi, phase_angle=self.phase_angle), [q[0]], [])
+            (U3Gate(pi, 0, pi, phase=self.phase), [q[0]], [])
         ]
 
     def inverse(self):
         """Invert this gate."""
-        return XGate(phase_angle=-self.phase_angle)  # self-inverse
+        return XGate(phase=-self.phase)  # self-inverse
 
     def _matrix_definition(self):
         """Return a Numpy.array for the X gate."""

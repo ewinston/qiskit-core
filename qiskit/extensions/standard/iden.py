@@ -39,9 +39,9 @@ class IdGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, phase_angle=0, label=None):
+    def __init__(self, phase=0, label=None):
         """Create new Identity gate."""
-        super().__init__("id", 1, [], phase_angle=phase_angle, label=label)
+        super().__init__("id", 1, [], phase=phase, label=label)
 
     def inverse(self):
         """Invert this gate."""

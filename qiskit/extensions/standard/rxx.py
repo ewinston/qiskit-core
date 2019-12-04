@@ -46,10 +46,10 @@ class RXXGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, theta, phase_angle=0, label=None):
+    def __init__(self, theta, phase=0, label=None):
         """Create new rxx gate."""
         super().__init__("rxx", 2, [theta],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         """Calculate a subcircuit that implements this unitary."""
@@ -60,7 +60,7 @@ class RXXGate(Gate):
             (U3Gate(np.pi / 2, theta, 0), [q[0]], []),
             (HGate(), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
-            (RZGate(-theta, phase_angle=self.phase_angle), [q[1]], []),
+            (RZGate(-theta, phase=self.phase), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
             (HGate(), [q[1]], []),
             (U2Gate(-np.pi, np.pi - theta), [q[0]], []),
@@ -71,7 +71,7 @@ class RXXGate(Gate):
 
     def inverse(self):
         """Invert this gate."""
-        return RXXGate(-self.params[0], phase_angle=-self.phase_angle)
+        return RXXGate(-self.params[0], phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the RXX gate."""

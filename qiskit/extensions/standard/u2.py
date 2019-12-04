@@ -32,22 +32,22 @@ class U2Gate(Gate):
 
     .. math::
 
-        U_2(\phi, lambda) = \frac{1}{\sqrt{2}}\begin{bmatrix}
+        U_2(\phi, \lambda) = \frac{1}{\sqrt{2}}\begin{bmatrix}
             1 & -e^{i \lambda} \\
-            e^{i \phi} & e^{i (phi+\lambda)}
+            e^{i \phi} & e^{i (\phi+\lambda)}
             \end{bmatrix}
     """
 
-    def __init__(self, phi, lam, phase_angle=0, label=None):
+    def __init__(self, phi, lam, phase=0, label=None):
         """Create new one-pulse single-qubit gate."""
         super().__init__("u2", 1, [phi, lam],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         q = QuantumRegister(1, "q")
         self.definition = [
             (U3Gate(pi / 2, self.params[0], self.params[1],
-             phase_angle=self.phase_angle), [q[0]], [])
+             phase=self.phase), [q[0]], [])
         ]
 
     def inverse(self):
@@ -56,7 +56,7 @@ class U2Gate(Gate):
         u2(phi,lamb)^dagger = u2(-lamb-pi,-phi+pi)
         """
         return U2Gate(-self.params[1] - pi, -self.params[0] + pi,
-                      phase_angle=-self.phase_angle)
+                      phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the U3 gate."""

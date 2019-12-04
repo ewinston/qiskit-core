@@ -37,16 +37,16 @@ class RZZGate(Gate):
                          (\sigma_Z\otimes\sigma_Z) \right)
             = \begin{bmatrix}
                 e^{-i\theta/2} & 0 & 0 & 0 \\
-                0 & 0& e^{{\theta/2} & 0 \\
+                0 & 0& e^{\theta/2} & 0 \\
                 0 & 0 & e^{i\theta/2} & 0 \\
                 0 & 0 & 0 & e^{-i\theta/2}
             \end{bmatrix}
     """
 
-    def __init__(self, theta, phase_angle=0, label=None):
+    def __init__(self, theta, phase=0, label=None):
         """Create new rzz gate."""
         super().__init__("rzz", 2, [theta],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         """
@@ -55,14 +55,14 @@ class RZZGate(Gate):
         q = QuantumRegister(2, "q")
         self.definition = [
             (CnotGate(), [q[0], q[1]], []),
-            (RZGate(self.params[0], phase_angle=self.phase_angle),
+            (RZGate(self.params[0], phase=self.phase),
              [q[1]], []),
             (CnotGate(), [q[0], q[1]], [])
         ]
 
     def inverse(self):
         """Invert this gate."""
-        return RZZGate(-self.params[0], phase_angle=-self.phase_angle)
+        return RZZGate(-self.params[0], phase=-self.phase)
 
     def _matrix_definition(self):
         """Return a Numpy.array for the RZZ gate."""

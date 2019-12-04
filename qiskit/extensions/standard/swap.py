@@ -42,10 +42,10 @@ class SwapGate(Gate):
             \end{bmatrix}
     """
 
-    def __init__(self, phase_angle=0, label=None):
+    def __init__(self, phase=0, label=None):
         """Create new SWAP gate."""
         super().__init__("swap", 2, [],
-                         phase_angle=phase_angle, label=label)
+                         phase=phase, label=label)
 
     def _define(self):
         """
@@ -59,13 +59,13 @@ class SwapGate(Gate):
         ]
         # Temporary fix to add phase angle until we have added
         # them to controlled gates like CNOT.
-        if self.phase_angle:
+        if self.phase:
             self.definition.append(
-                (U1Gate(0, phase_angle=self.phase_angle), [q[0]], []))
+                (U1Gate(0, phase=self.phase), [q[0]], []))
 
     def inverse(self):
         """Invert this gate."""
-        return SwapGate(phase_angle=-self.phase_angle)  # self-inverse
+        return SwapGate(phase=-self.phase)  # self-inverse
 
     def _matrix_definition(self):
         """Return a Numpy.array for the Swap gate."""

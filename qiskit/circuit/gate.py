@@ -26,51 +26,37 @@ from .instruction import Instruction
 class Gate(Instruction):
     """Unitary gate."""
 
-    def __init__(self, name, num_qubits, params, phase_angle=0, label=None):
+    def __init__(self, name, num_qubits, params, phase=0, label=None):
         """Create a new gate.
 
         Args:
             name (str): the Qobj name of the gate
             num_qubits (int): the number of qubits the gate acts on.
             params (list): a list of parameters.
-            phase_angle (float): set the exponent of the gate phase (Default: 0).
+            phase (float): set the gate phase (Default: 0).
             label (str or None): An optional label for the gate (Default: None).
         """
         self._label = label
         self.definition = None
-        self._phase_angle = 0
-        if phase_angle:
-            self.phase_angle = phase_angle
+        self._phase = phase
         super().__init__(name, num_qubits, 0, params)
 
     @property
     def phase(self):
         """Return the phase of the gate."""
-        return cmath.exp(1j * self.phase_angle) if self.phase_angle else 1
+        return self._phase
 
     @phase.setter
-    def phase(self, value):
+    def phase(self, angle):
         """Set the phase of the gate."""
-        scale, angle = cmath.polar(value)
-        if scale != 1:
-            raise ValueError("Phase value must have absolute value of 1.")
-        self.phase_angle = angle
-
-    @property
-    def phase_angle(self):
-        """Return the phase angle of the gate."""
-        return self._phase_angle
-
-    @phase_angle.setter
-    def phase_angle(self, angle):
-        """Set the phase angle of the gate."""
-        # Set the angle to the [-2 * pi, 2 * pi] interval
+        # Set the phase to the [-2 * pi, 2 * pi] interval
+        angle = float(angle)
         if not angle:
-            self._phase_angle = 0
+            self._phase = 0
         elif angle < 0:
-            self._phase_angle = angle % (-2 * math.pi)
+            self._phase = angle % (-2 * math.pi)
         else:
-            self._phase_angle = angle % (2 * math.pi)
+            self._phase = angle % (2 * math.pi)
 
     def _matrix_definition(self):
         """Return the Numpy.array matrix definition of the gate."""
@@ -84,9 +70,10 @@ class Gate(Instruction):
             CircuitError: If a Gate subclass does not implement this method an
                 exception will be raised when this base class method is called.
         """
-        if self._matrix_definition() is None:
+        mat = self._matrix_definition()
+        if mat is None:
             raise CircuitError("to_matrix not defined for this {}".format(type(self)))
-        return self.phase * self._matrix_definition()
+        return cmath.exp(1j * self._phase) * mat if self._phase else mat
 
     def power(self, exponent):
         """Creates a unitary gate as `gate^exponent`.
@@ -126,8 +113,8 @@ class Gate(Instruction):
         instruction = super().assemble()
         if self.label:
             instruction.label = self.label
-        if self.phase_angle:
-            instruction.phase_angle = self.phase_angle
+        if self._phase:
+            instruction.phase = self._phase
         return instruction
 
     @property
