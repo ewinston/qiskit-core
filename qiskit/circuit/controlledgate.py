@@ -23,7 +23,8 @@ from .gate import Gate
 class ControlledGate(Gate):
     """Controlled unitary gate."""
 
-    def __init__(self, name, num_qubits, params, label=None, num_ctrl_qubits=1,
+    def __init__(self, name, num_qubits, params, phase=0, label=None,
+                 num_ctrl_qubits=1,
                  definition=None):
         """Create a new gate.
 
@@ -31,13 +32,14 @@ class ControlledGate(Gate):
             name (str): The Qobj name of the gate.
             num_qubits (int): The number of qubits the gate acts on.
             params (list): A list of parameters.
-            label (str or None): An optional label for the gate [Default: None]
+            phase (float): set the gate phase (Default: 0).
+            label (str or None): An optional label for the gate (Default: None).
             num_ctrl_qubits (int): Number of control qubits.
             definition (list): list of gate rules for implementing this gate.
         Raises:
             CircuitError: num_ctrl_qubits >= num_qubits
         """
-        super().__init__(name, num_qubits, params, label=label)
+        super().__init__(name, num_qubits, params, phase=phase, label=label)
         if num_ctrl_qubits < num_qubits:
             self.num_ctrl_qubits = num_ctrl_qubits
         else:

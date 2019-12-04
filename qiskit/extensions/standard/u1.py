@@ -55,8 +55,7 @@ class U1Gate(Gate):
 
     def _matrix_definition(self):
         """Return a Numpy.array for the U3 gate."""
-        lam = self.params[0]
-        lam = float(lam)
+        lam = float(self.params[0])
         return numpy.array([[1, 0], [0, numpy.exp(1j * lam)]], dtype=complex)
 
 

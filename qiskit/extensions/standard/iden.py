@@ -45,9 +45,9 @@ class IdGate(Gate):
 
     def inverse(self):
         """Invert this gate."""
-        return IdGate()  # self-inverse
+        return IdGate(phase=-self.phase)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the Id gate."""
         return numpy.array([[1, 0],
                             [0, 1]], dtype=complex)

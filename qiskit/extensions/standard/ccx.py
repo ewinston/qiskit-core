@@ -29,11 +29,35 @@ from qiskit.extensions.standard.t import TdgGate
 
 
 class ToffoliGate(ControlledGate):
-    """Toffoli gate."""
+    r"""Toffoli (Controlled-CNOT) gate.
 
-    def __init__(self):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{CX}} =&
+            I \otimes |0, 0 \rangle\!\langle 0, 0| +
+            I \otimes |0, 1 \rangle\!\langle 0, 1| +
+            I \otimes |1, 0 \rangle\!\langle 1, 0| +
+            U_{\text{X}} \otimes |1, 1 \rangle\!\langle 1, 1| \\
+            =&
+            \begin{bmatrix}
+                1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+                0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+                0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+                0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+                0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+                0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+                0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+                0 & 0 & 0 & 1 & 0 & 0 & 0 & 0
+            \end{bmatrix}
+    """
+    def __init__(self,  phase=0, label=None):
         """Create new Toffoli gate."""
-        super().__init__("ccx", 3, [], num_ctrl_qubits=2)
+        super().__init__("ccx", 3, [],  phase=0, label=None,
+                         num_ctrl_qubits=2)
         self.base_gate = XGate
         self.base_gate_name = "x"
 
@@ -46,10 +70,9 @@ class ToffoliGate(ControlledGate):
         t b; t c; h c; cx a,b;
         t a; tdg b; cx a,b;}
         """
-        definition = []
         q = QuantumRegister(3, "q")
-        rule = [
-            (HGate(), [q[2]], []),
+        self.definition = [
+            (HGate(phase=self.phase), [q[2]], []),
             (CnotGate(), [q[1], q[2]], []),
             (TdgGate(), [q[2]], []),
             (CnotGate(), [q[0], q[2]], []),
@@ -65,15 +88,12 @@ class ToffoliGate(ControlledGate):
             (TdgGate(), [q[1]], []),
             (CnotGate(), [q[0], q[1]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return ToffoliGate()  # self-inverse
+        return ToffoliGate(phase=-self.phase)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the Toffoli gate."""
         return numpy.array([[1, 0, 0, 0, 0, 0, 0, 0],
                             [0, 1, 0, 0, 0, 0, 0, 0],

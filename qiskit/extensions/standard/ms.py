@@ -49,6 +49,10 @@ class MSGate(Gate):
                                 phase=phase), [q[i], q[j]], [])]
         self.definition = definition
 
+    def inverse(self):
+        """Invert this gate."""
+        return MSGate(self.num_qubits, -self.params[0], phase=self.phase)
+
 
 def ms(self, theta, qubits):
     """Apply MS to q1 and q2."""

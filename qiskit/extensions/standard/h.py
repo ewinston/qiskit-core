@@ -57,7 +57,7 @@ class HGate(Gate):
         """Invert this gate."""
         return HGate(phase=-self.phase)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the H gate."""
         return numpy.array([[1, 1],
                             [1, -1]], dtype=complex) / numpy.sqrt(2)

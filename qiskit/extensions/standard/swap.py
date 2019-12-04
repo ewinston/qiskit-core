@@ -25,7 +25,7 @@ from qiskit.extensions.standard.u1 import U1Gate
 
 
 class SwapGate(Gate):
-    r"""SWAP gate.
+    r"""Swap gate.
 
     **Matrix Definition**
 
@@ -33,7 +33,7 @@ class SwapGate(Gate):
 
     .. math::
 
-        U_{\text{SWAP}}
+        U_{\text{Swap}}
             = \begin{bmatrix}
                 1 & 0 & 0 & 0 \\
                 0 & 0 & 1 & 0 \\
@@ -43,7 +43,7 @@ class SwapGate(Gate):
     """
 
     def __init__(self, phase=0, label=None):
-        """Create new SWAP gate."""
+        """Create new Swap gate."""
         super().__init__("swap", 2, [],
                          phase=phase, label=label)
 
@@ -53,15 +53,10 @@ class SwapGate(Gate):
         """
         q = QuantumRegister(2, "q")
         self.definition = [
-            (CnotGate(), [q[0], q[1]], []),
+            (CnotGate(phase=self.phase), [q[0], q[1]], []),
             (CnotGate(), [q[1], q[0]], []),
             (CnotGate(), [q[0], q[1]], [])
         ]
-        # Temporary fix to add phase angle until we have added
-        # them to controlled gates like CNOT.
-        if self.phase:
-            self.definition.append(
-                (U1Gate(0, phase=self.phase), [q[0]], []))
 
     def inverse(self):
         """Invert this gate."""
@@ -76,7 +71,7 @@ class SwapGate(Gate):
 
 
 def swap(self, qubit1, qubit2):
-    """Apply SWAP from qubit1 to qubit2."""
+    """Apply Swap from qubit1 to qubit2."""
     return self.append(SwapGate(), [qubit1, qubit2], [])
 
 

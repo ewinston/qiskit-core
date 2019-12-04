@@ -23,19 +23,38 @@ from qiskit.extensions.standard.x import XGate
 
 
 class CnotGate(ControlledGate):
-    """controlled-NOT gate."""
+    r"""Controlled-CNOT gate.
 
-    def __init__(self):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{CX}} =
+            I \otimes |0 \rangle\!\langle 0| +
+            U_{\text{X}} \otimes |1 \rangle\!\langle 1|
+            =
+            \begin{bmatrix}
+                1 & 0 & 0 & 0 \\
+                0 & 0 & 0 & 1 \\
+                0 & 0 & 1 & 0 \\
+                0 & 1 & 0 & 0
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase=0, label=None):
         """Create new CNOT gate."""
-        super().__init__("cx", 2, [], num_ctrl_qubits=1)
+        super().__init__("cx", 2, [], phase=phase, label=label,
+                         num_ctrl_qubits=1)
         self.base_gate = XGate
         self.base_gate_name = "x"
 
     def inverse(self):
         """Invert this gate."""
-        return CnotGate()  # self-inverse
+        return CnotGate(phase=-self.phase)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the Cx gate."""
         return numpy.array([[1, 0, 0, 0],
                             [0, 0, 0, 1],

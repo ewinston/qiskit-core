@@ -15,6 +15,8 @@
 """
 controlled-rz gate.
 """
+import numpy
+
 from qiskit.circuit import ControlledGate
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit import QuantumRegister
@@ -24,11 +26,28 @@ from qiskit.extensions.standard.rz import RZGate
 
 
 class CrzGate(ControlledGate):
-    """controlled-rz gate."""
+    r"""Controlled rotation around the z axis.
 
-    def __init__(self, theta):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{CRZ}}(\theta) =
+            I \otimes |0 \rangle\!\langle 0| +
+            U_{\text{RZ}}(\theta) \otimes |1 \rangle\!\langle 1|
+            = \begin{bmatrix}
+                1 & 0 & 0 & 0 \\
+                0 & e^{-i \theta/2} & 0 & 0 \\
+                0 & 0 & 1 & 0 \\
+                0 & 0 & 0 & e^{i \theta/2}
+            \end{bmatrix}
+    """
+    def __init__(self, theta, phase=0, label=None):
         """Create new crz gate."""
-        super().__init__("crz", 2, [theta], num_ctrl_qubits=1)
+        super().__init__("crz", 2, [theta], phase=0, label=None,
+                         num_ctrl_qubits=1)
         self.base_gate = RZGate
         self.base_gate_name = "rz"
 
@@ -39,21 +58,25 @@ class CrzGate(ControlledGate):
           u1(-lambda/2) b; cx a,b;
         }
         """
-        definition = []
         q = QuantumRegister(2, "q")
-        rule = [
-            (U1Gate(self.params[0] / 2), [q[1]], []),
+        self.definition = [
+            (U1Gate(self.params[0] / 2, phase=self.phase), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
             (U1Gate(-self.params[0] / 2), [q[1]], []),
             (CnotGate(), [q[0], q[1]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return CrzGate(-self.params[0])
+        return CrzGate(-self.params[0], phase=-self.phase)
+
+    def _matrix_definition(self):
+        """Return a Numpy.array for the Controlled-Rz gate."""
+        theta = float(self.params[0])
+        return numpy.array([[1, 0, 0, 0],
+                            [0, numpy.exp(-1j * theta / 2), 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, numpy.exp(1j * theta / 2)]], dtype=complex)
 
 
 def crz(self, theta, ctl, tgt):
