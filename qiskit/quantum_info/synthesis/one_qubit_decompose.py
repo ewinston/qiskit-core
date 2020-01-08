@@ -86,7 +86,7 @@ class OneQubitEulerDecomposer:
         basis_methods = {
             'U3': (self._angles_zyz, self._circuit_u3),
             'U1X': (self._angles_zyz, self._circuit_u1x),
-            'RR': (self._angles_zyz, self._circuit_u1x),
+            'RR': (self._angles_zyz, self._circuit_rr),
             'ZYZ': (self._angles_zyz, self._circuit_zyz),
             'ZXZ': (self._angles_zxz, self._circuit_zxz),
             'XYX': (self._angles_xyx, self._circuit_xyx)
@@ -326,7 +326,7 @@ class OneQubitEulerDecomposer:
                      simplify=True,
                      atol=DEFAULT_ATOL):
         circuit = QuantumCircuit(1)
-        if not simplify or not (np.isclose(abs(theta), np.pi, atol=atol)):
+        if not simplify or not np.isclose(theta, -np.pi, atol=atol):
             circuit.append(RGate(theta + np.pi, np.pi / 2 - lam), [0])
         circuit.append(RGate(-np.pi, 0.5 * (phi - lam + np.pi), phase=phase), [0])
         return circuit
