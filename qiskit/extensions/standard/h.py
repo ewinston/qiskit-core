@@ -26,11 +26,24 @@ from qiskit.util import deprecate_arguments
 
 # pylint: disable=cyclic-import
 class HGate(Gate):
-    """Hadamard gate."""
+    r"""Hadamard gate.
 
-    def __init__(self, label=None):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{H}} = \frac{1}{\sqrt{2}}
+            \begin{bmatrix}
+                1 & 1 \\
+                1 & -1
+            \end{bmatrix}
+    """
+
+    def __init__(self, phase=0, label=None):
         """Create new Hadamard gate."""
-        super().__init__("h", 1, [], label=label)
+        super().__init__("h", 1, [], phase=phase, label=label)
 
     def _define(self):
         """
@@ -39,12 +52,9 @@ class HGate(Gate):
         from qiskit.extensions.standard.u2 import U2Gate
         definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U2Gate(0, pi), [q[0]], [])
+        self.definition = [
+            (U2Gate(0, pi, phase=self.phase), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def control(self, num_ctrl_qubits=1, label=None):
         """Controlled version of this gate.
@@ -62,9 +72,9 @@ class HGate(Gate):
 
     def inverse(self):
         """Invert this gate."""
-        return HGate()  # self-inverse
+        return HGate(phase=-self.phase)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the H gate."""
         return numpy.array([[1, 1],
                             [1, -1]], dtype=complex) / numpy.sqrt(2)
@@ -102,11 +112,30 @@ QuantumCircuit.h = h
 
 
 class CHGate(ControlledGate):
-    """controlled-H gate."""
+    r"""controlled-H gate.
 
-    def __init__(self):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{CH}} =
+            I \otimes |0 \rangle\!\langle 0| +
+            U_{\text{H}} \otimes |1 \rangle\!\langle 1|
+            = \begin{bmatrix}
+                1 & 0 & 0 & 0 \\
+                0 & \frac{1}{\sqrt{2}} & 0 & \frac{1}{\sqrt{2}} \\
+                0 & 0 & 1 & 0 \\
+                0 & \frac{1}{\sqrt{2}} & 0 & -\frac{1}{\sqrt{2}}
+            \end{bmatrix}
+    """
+
+
+    def __init__(self, phase=0, label=None):
         """Create new CH gate."""
-        super().__init__("ch", 2, [], num_ctrl_qubits=1)
+        super().__init__("ch", 2, [], phase=0, label=None,
+                         num_ctrl_qubits=1)
         self.base_gate = HGate()
 
     def _define(self):
@@ -124,10 +153,9 @@ class CHGate(ControlledGate):
         from qiskit.extensions.standard.s import SGate, SdgGate
         from qiskit.extensions.standard.t import TGate, TdgGate
         from qiskit.extensions.standard.x import CnotGate
-        definition = []
         q = QuantumRegister(2, "q")
-        rule = [
-            (SGate(), [q[1]], []),
+        self.definition = [
+            (SGate(phase=self.phase), [q[1]], []),
             (HGate(), [q[1]], []),
             (TGate(), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
@@ -135,15 +163,12 @@ class CHGate(ControlledGate):
             (HGate(), [q[1]], []),
             (SdgGate(), [q[1]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
-        return CHGate()  # self-inverse
+        return CHGate(phase=-self.phase)  # self-inverse
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the Ch gate."""
         return numpy.array([[1, 0, 0, 0],
                             [0, 1/numpy.sqrt(2), 0, 1/numpy.sqrt(2)],

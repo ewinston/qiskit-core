@@ -26,25 +26,37 @@ from qiskit.util import deprecate_arguments
 
 
 class RXGate(Gate):
-    """rotation around the x-axis."""
+    r"""rotation around the x-axis.
 
-    def __init__(self, theta):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{RX}}(\theta)
+            = \exp\left(-i \frac{\theta}{2} \sigma_X \right)
+            = \begin{bmatrix}
+                \cos(\theta / 2) & -i \sin(\theta / 2) \\
+                -i \sin(\theta / 2) &  \cos(\theta / 2)
+            \end{bmatrix}
+    """
+
+    def __init__(self, theta, phase=0, label=None):
         """Create new rx single qubit gate."""
-        super().__init__("rx", 1, [theta])
+        super().__init__("rx", 1, [theta],
+                         phase=phase, label=label)
 
     def _define(self):
         """
         gate rx(theta) a {r(theta, 0) a;}
         """
         from qiskit.extensions.standard.r import RGate
-        definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (RGate(self.params[0], 0), [q[0]], [])
+        self.definition = [
+            (RGate(self.params[0], 0, phase=self.phase),
+             [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def control(self, num_ctrl_qubits=1, label=None):
         """Controlled version of this gate.
@@ -65,9 +77,9 @@ class RXGate(Gate):
 
         rx(theta)^dagger = rx(-theta)
         """
-        return RXGate(-self.params[0])
+        return RXGate(-self.params[0], phase=-self.phase)
 
-    def to_matrix(self):
+    def _matrix_definition(self):
         """Return a Numpy.array for the RX gate."""
         cos = math.cos(self.params[0] / 2)
         sin = math.sin(self.params[0] / 2)
@@ -111,9 +123,10 @@ QuantumCircuit.rx = rx
 class CrxGate(ControlledGate):
     """controlled-rx gate."""
 
-    def __init__(self, theta):
+    def __init__(self, theta, phase=0, label=None):
         """Create new crx gate."""
-        super().__init__('crx', 2, [theta], num_ctrl_qubits=1)
+        super().__init__('crx', 2, [theta], phase=0, label=None,
+                         num_ctrl_qubits=1)
         self.base_gate = RXGate(theta)
 
     def _define(self):
@@ -132,7 +145,7 @@ class CrxGate(ControlledGate):
         definition = []
         q = QuantumRegister(2, 'q')
         rule = [
-            (U1Gate(pi / 2), [q[1]], []),
+            (U1Gate(pi / 2, phase=self.phase), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
             (U3Gate(-self.params[0] / 2, 0, 0), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),

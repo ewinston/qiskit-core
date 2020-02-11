@@ -31,6 +31,10 @@ def add_control(operation, num_ctrl_qubits, label):
             uses num_ctrl_qubits-1 ancillae qubits so returns a gate of size
             num_qubits + 2*num_ctrl_qubits - 1.
     """
+    if operation.phase:
+        # If gate has a global phase set we convert to unitary gate before
+        # making the controled version
+        operation = UnitaryGate(operation.to_matrix())
     import qiskit.extensions.standard as standard
     if isinstance(operation, standard.RZGate) or operation.name == 'rz':
         # num_ctrl_qubits > 1

@@ -15,6 +15,7 @@
 """
 Rotation around the z-axis.
 """
+import numpy
 from qiskit.circuit import Gate
 from qiskit.circuit import ControlledGate
 from qiskit.circuit import QuantumCircuit
@@ -23,11 +24,26 @@ from qiskit.util import deprecate_arguments
 
 
 class RZGate(Gate):
-    """rotation around the z-axis."""
+    r"""rotation around the z-axis.
 
-    def __init__(self, phi):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{RZ}}(\theta)
+            = \exp\left(-i \frac{\theta}{2} \sigma_Z \right)
+            = \begin{bmatrix}
+                e^{-i \theta/2} & 0 \\
+                0 & e^{i \theta/2}
+            \end{bmatrix}
+    """
+
+    def __init__(self, phi, phase=0, label=None):
         """Create new rz single qubit gate."""
-        super().__init__("rz", 1, [phi])
+        super().__init__("rz", 1, [phi],
+                         phase=phase, label=label)
 
     def _define(self):
         """
@@ -36,12 +52,9 @@ class RZGate(Gate):
         from qiskit.extensions.standard.u1 import U1Gate
         definition = []
         q = QuantumRegister(1, "q")
-        rule = [
-            (U1Gate(self.params[0]), [q[0]], [])
+        self.definition = [
+            (U1Gate(self.params[0], phase=self.phase), [q[0]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def control(self, num_ctrl_qubits=1, label=None):
         """Controlled version of this gate.
@@ -62,7 +75,13 @@ class RZGate(Gate):
 
         rz(phi)^dagger = rz(-phi)
         """
-        return RZGate(-self.params[0])
+        return RZGate(-self.params[0], phase=-self.phase)
+
+    def _matrix_definition(self):
+        """Return a Numpy.array for the RZ gate."""
+        return numpy.array([[numpy.exp(-1j * self.params[0] / 2), 0],
+                            [0, numpy.exp(1j * self.params[0] / 2)]],
+                           dtype=complex)
 
 
 @deprecate_arguments({'q': 'qubit'})
@@ -91,11 +110,29 @@ QuantumCircuit.rz = rz
 
 
 class CrzGate(ControlledGate):
-    """controlled-rz gate."""
+    r"""Controlled rotation around the z axis.
 
-    def __init__(self, theta):
+    **Matrix Definition**
+
+    The matrix for this gate is given by:
+
+    .. math::
+
+        U_{\text{CRZ}}(\theta) =
+            I \otimes |0 \rangle\!\langle 0| +
+            U_{\text{RZ}}(\theta) \otimes |1 \rangle\!\langle 1|
+            = \begin{bmatrix}
+                1 & 0 & 0 & 0 \\
+                0 & e^{-i \theta/2} & 0 & 0 \\
+                0 & 0 & 1 & 0 \\
+                0 & 0 & 0 & e^{i \theta/2}
+            \end{bmatrix}
+    """
+
+    def __init__(self, theta, phase=0, label=None):
         """Create new crz gate."""
-        super().__init__("crz", 2, [theta], num_ctrl_qubits=1)
+        super().__init__("crz", 2, [theta], phase=0, label=None,
+                         num_ctrl_qubits=1)
         self.base_gate = RZGate(theta)
 
     def _define(self):
@@ -107,21 +144,25 @@ class CrzGate(ControlledGate):
         """
         from qiskit.extensions.standard.x import CnotGate
         from qiskit.extensions.standard.u1 import U1Gate
-        definition = []
         q = QuantumRegister(2, "q")
-        rule = [
-            (U1Gate(self.params[0] / 2), [q[1]], []),
+        self.definition = [
+            (U1Gate(self.params[0] / 2, phase=self.phase), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
             (U1Gate(-self.params[0] / 2), [q[1]], []),
             (CnotGate(), [q[0], q[1]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
         return CrzGate(-self.params[0])
+
+    def _matrix_definition(self):
+        """Return a Numpy.array for the Controlled-Rz gate."""
+        theta = float(self.params[0])
+        return numpy.array([[1, 0, 0, 0],
+                            [0, numpy.exp(-1j * theta / 2), 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, numpy.exp(1j * theta / 2)]], dtype=complex)
 
 
 @deprecate_arguments({'ctl': 'control_qubit', 'tgt': 'target_qubit'})
