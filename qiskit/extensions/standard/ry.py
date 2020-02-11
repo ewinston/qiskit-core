@@ -54,7 +54,7 @@ class RYGate(Gate):
         from qiskit.extensions.standard.r import RGate
         q = QuantumRegister(1, "q")
         self.definition = [
-            (RGate(self.params[0], pi/2, phase=self.phase),
+            (RGate(self.params[0], pi/2),
              [q[0]], [])
         ]
 

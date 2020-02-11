@@ -55,8 +55,7 @@ class RGate(Gate):
         theta = self.params[0]
         phi = self.params[1]
         self.definition = [
-            (U3Gate(theta, phi - pi / 2, -phi + pi / 2,
-                    phase=self.phase), [q[0]], [])
+            (U3Gate(theta, phi - pi / 2, -phi + pi / 2), [q[0]], [])
         ]
 
     def inverse(self):

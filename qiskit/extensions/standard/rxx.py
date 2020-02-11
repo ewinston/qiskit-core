@@ -55,7 +55,7 @@ class RXXGate(Gate):
         q = QuantumRegister(2, "q")
         self.definition = [
             (CnotGate(), [q[0], q[1]], []),
-            (RZGate(self.params[0], phase=self.phase),
+            (RZGate(self.params[0]),
              [q[1]], []),
             (CnotGate(), [q[0], q[1]], [])
         ]

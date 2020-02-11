@@ -53,7 +53,7 @@ class XGate(Gate):
         from qiskit.extensions.standard.u3 import U3Gate
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U3Gate(pi, 0, pi, phase=self.phase), [q[0]], [])
+            (U3Gate(pi, 0, pi), [q[0]], [])
         ]
 
     def control(self, num_ctrl_qubits=1, label=None):

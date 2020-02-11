@@ -53,7 +53,7 @@ class RZGate(Gate):
         definition = []
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U1Gate(self.params[0], phase=self.phase), [q[0]], [])
+            (U1Gate(self.params[0]), [q[0]], [])
         ]
 
     def control(self, num_ctrl_qubits=1, label=None):

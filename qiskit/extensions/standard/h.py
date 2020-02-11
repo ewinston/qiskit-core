@@ -50,10 +50,9 @@ class HGate(Gate):
         gate h a { u2(0,pi) a; }
         """
         from qiskit.extensions.standard.u2 import U2Gate
-        definition = []
         q = QuantumRegister(1, "q")
         self.definition = [
-            (U2Gate(0, pi, phase=self.phase), [q[0]], [])
+            (U2Gate(0, pi), [q[0]], [])
         ]
 
     def control(self, num_ctrl_qubits=1, label=None):

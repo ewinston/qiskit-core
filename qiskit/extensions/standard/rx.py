@@ -54,8 +54,7 @@ class RXGate(Gate):
         from qiskit.extensions.standard.r import RGate
         q = QuantumRegister(1, "q")
         self.definition = [
-            (RGate(self.params[0], 0, phase=self.phase),
-             [q[0]], [])
+            (RGate(self.params[0], 0), [q[0]], [])
         ]
 
     def control(self, num_ctrl_qubits=1, label=None):
@@ -142,18 +141,14 @@ class CrxGate(ControlledGate):
         from qiskit.extensions.standard.u1 import U1Gate
         from qiskit.extensions.standard.u3 import U3Gate
         from qiskit.extensions.standard.x import CnotGate
-        definition = []
         q = QuantumRegister(2, 'q')
-        rule = [
-            (U1Gate(pi / 2, phase=self.phase), [q[1]], []),
+        self.definition = [
+            (U1Gate(pi / 2), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
             (U3Gate(-self.params[0] / 2, 0, 0), [q[1]], []),
             (CnotGate(), [q[0], q[1]], []),
             (U3Gate(self.params[0] / 2, -pi / 2, 0), [q[1]], [])
         ]
-        for inst in rule:
-            definition.append(inst)
-        self.definition = definition
 
     def inverse(self):
         """Invert this gate."""
