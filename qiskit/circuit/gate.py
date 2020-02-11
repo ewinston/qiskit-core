@@ -46,6 +46,16 @@ class Gate(Instruction):
         """Return the phase of the gate."""
         return self._phase
 
+    @property
+    def definition(self):
+        super().definition
+        if self.phase:
+            q = QuantumRegister(self.num_qubits, "q")
+            from qiskit.extensions.standard import RZGate
+            for i in range(self.num_qubits):
+                self._definition.append([RZGate(self.phase), q[i], []])
+        
+
     @phase.setter
     def phase(self, angle):
         """Set the phase of the gate."""

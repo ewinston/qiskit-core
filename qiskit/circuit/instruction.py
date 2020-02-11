@@ -213,10 +213,6 @@ class Instruction:
         """Return definition in terms of other basic gates."""
         if self._definition is None:
             self._define()
-        if self.phase:
-            q = QuantumRegister(self.num_qubits, "q")
-            from qiskit.extensions.standard import RZGate
-            self._definition.append(RZGate(self.phase))
         return self._definition
 
     @definition.setter
