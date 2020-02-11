@@ -253,7 +253,7 @@ class ToffoliGate(ControlledGate):
         from qiskit.extensions.standard.t import TGate, TdgGate
         q = QuantumRegister(3, "q")
         self.definition = [
-            (HGate(phase=self.phase), [q[2]], []),
+            (HGate(), [q[2]], []),
             (CnotGate(), [q[1], q[2]], []),
             (TdgGate(), [q[2]], []),
             (CnotGate(), [q[0], q[2]], []),
