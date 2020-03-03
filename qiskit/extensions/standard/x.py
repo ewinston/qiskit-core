@@ -173,7 +173,7 @@ class CXGate(ControlledGate, metaclass=CXMeta):
         """
         if ctrl_state is None:
             if num_ctrl_qubits == 1:
-                return CXXGate(phase=self.phase, label=label)
+                return CCXGate(phase=self.phase, label=label)
         return super().control(num_ctrl_qubits=num_ctrl_qubits, label=label,
                                ctrl_state=ctrl_state)
 

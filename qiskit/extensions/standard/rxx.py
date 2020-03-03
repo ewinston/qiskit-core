@@ -15,6 +15,8 @@
 """
 Two-qubit XX-rotation gate.
 """
+import numpy as np
+
 from qiskit.circuit import Gate
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit import QuantumRegister
@@ -26,7 +28,7 @@ class RXXGate(Gate):
     This gate corresponds to the rotation U(θ) = exp(-1j * θ * X⊗X / 2).
 
     ** Matrix Definition**
-    
+
     The matrix for this gate is given by:
 
     .. math::
@@ -51,16 +53,16 @@ class RXXGate(Gate):
         """
         gate rzz(theta) a, b { cx a, b; rz(theta) b; cx a, b; }
         """
-	from qiskit.extensions.standard.x import CXGate
+        from qiskit.extensions.standard.x import CXGate
         from qiskit.extensions.standard.rz import RZGate
         q = QuantumRegister(2, 'q')
         self.definition = [
-            (CnotGate(), [q[0], q[1]], []),
+            (CXGate(), [q[0], q[1]], []),
             (RZGate(self.params[0], phase=self.phase),
              [q[1]], []),
-            (CnotGate(), [q[0], q[1]], [])
+            (CXGate(), [q[0], q[1]], [])
         ]
-   
+
     def inverse(self):
         """Invert this gate."""
         return RXXGate(-self.params[0], phase=-self.phase)

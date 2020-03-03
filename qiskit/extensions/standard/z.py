@@ -51,7 +51,7 @@ class ZGate(Gate):
             (U1Gate(pi, phase=self.phase), [q[0]], [])
         ]
 
-    def control(self, num_ctrl_qubits=1, label=None):
+    def control(self, num_ctrl_qubits=1, label=None, ctrl_state=None):
         """Controlled version of this gate.
 
         Args:
@@ -164,7 +164,7 @@ class CZGate(ControlledGate, metaclass=CZMeta):
 
     def inverse(self):
         """Invert this gate."""
-        return CzGate(phase=-self.phase)  # self-inverse
+        return CZGate(phase=-self.phase)  # self-inverse
 
     def _matrix_definition(self):
         """Return a numpy.array for the CZ gate."""

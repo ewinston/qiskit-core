@@ -128,7 +128,7 @@ class CSwapMeta(type):
 
 
 class CSwapGate(ControlledGate, metaclass=CSwapMeta):
-    """The controlled-swap gate, also called Fredkin gate."""
+    r"""The controlled-swap gate, also called Fredkin gate.
 
     **Matrix Definition**
 

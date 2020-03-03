@@ -172,12 +172,16 @@ class CU3Gate(ControlledGate, metaclass=CU3Meta):
         """Return a Numpy.array for the Cu3 gate."""
         theta, phi, lam = self.params
         theta, phi, lam = float(theta), float(phi), float(lam)
-        return numpy.array([[1, 0, 0, 0],
-                            [0, numpy.cos(theta / 2),
-                             0, -numpy.exp(1j * lam) * numpy.sin(theta / 2)],
-                            [0, 0, 1, 0],
-                            [0, numpy.exp(1j * phi) * numpy.sin(theta / 2),
-                             0, numpy.exp(1j * (phi + lam)) * numpy.cos(theta / 2)]
+        half_sine = numpy.sin(theta / 2)
+        half_cosine = numpy.cos(theta / 2)
+        return numpy.array([
+            [1, 0, 0, 0],
+            [0, half_cosine, 0, -numpy.exp(1j * lam) * half_sine],
+            [0, 0, 1, 0],
+            [0, numpy.exp(1j * phi) * half_sine, 0, numpy.exp(1j * (phi + lam)) * half_cosine]
+        ])
+
+
 class Cu3Gate(CU3Gate, metaclass=CU3Meta):
     """The deprecated CU3Gate class."""
 
@@ -188,7 +192,6 @@ class Cu3Gate(CU3Gate, metaclass=CU3Meta):
                       'You should use the class CU3Gate instead.',
                       DeprecationWarning, stacklevel=2)
         super().__init__(theta, phi, lam)
-                            ], dtype=complex)
 
 
 @deprecate_arguments({'ctl': 'control_qubit',
