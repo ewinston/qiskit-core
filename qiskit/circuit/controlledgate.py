@@ -23,8 +23,8 @@ from . import QuantumRegister
 class ControlledGate(Gate):
     """Controlled unitary gate."""
 
-    def __init__(self, name, num_qubits, params, label=None, num_ctrl_qubits=1,
-                 definition=None, ctrl_state=None):
+    def __init__(self, name, num_qubits, params, num_ctrl_qubits=1, phase=0,
+                 label=None, definition=None, ctrl_state=None):
         """Create a controlled gate.
 
         Attributes:
@@ -35,7 +35,8 @@ class ControlledGate(Gate):
             name (str): The Qobj name of the gate.
             num_qubits (int): The number of qubits the gate acts on.
             params (list): A list of parameters.
-            label (str or None): An optional label for the gate [Default: None]
+            phase (float): set the gate phase (Default: 0).
+            label (str or None): An optional label for the gate (Default: None).
             num_ctrl_qubits (int): Number of control qubits.
             definition (list): list of gate rules for implementing this gate.
             ctrl_state (int or str or None): The control state in decimal or as
@@ -46,7 +47,7 @@ class ControlledGate(Gate):
             CircuitError: num_ctrl_qubits >= num_qubits
             CircuitError: ctrl_state < 0 or ctrl_state > 2**num_ctrl_qubits.
         """
-        super().__init__(name, num_qubits, params, label=label)
+        super().__init__(name, num_qubits, params, phase=phase, label=label)
         if num_ctrl_qubits < num_qubits:
             self.num_ctrl_qubits = num_ctrl_qubits
         else:
