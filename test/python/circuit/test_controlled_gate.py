@@ -1067,6 +1067,22 @@ class TestControlledGate(QiskitTestCase):
         self.assertEqual(Operator(cgate), Operator(target))
         self.assertEqual(Operator(ccirc), Operator(target))
 
+    def test_u_power_global_phase(self):
+        """
+        Test controlling power of u gate with global phase.
+        """
+        theta = pi/5
+        circ = QuantumCircuit(1, global_phase=theta)
+        ugate = UGate(0.1, 0.2, 0.3)
+        circ.append(ugate, [0])
+        pcirc = circ.power(2)
+        ccirc = pcirc.control()
+
+        base_mat = np.exp(1j*theta) * ugate.to_matrix()
+        base_mat_2x = base_mat @ base_mat
+        expected_mat = _compute_control_matrix(base_mat_2x, 1)
+        self.assertEqual(Operator(ccirc), Operator(expected_mat))
+
     @data(1, 2)
     def test_nested_global_phase(self, num_ctrl_qubits):
         """
